@@ -1,0 +1,21 @@
+{
+  "name": "Crypto Greed Index",
+  "short_name": "GreedIndex",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "description": "Crypto Greed Index delivers real-time fear and greed analytics, market heatmaps, and top crypto movers.",
+  "icons": [
+    {
+      "src": "/cryptogreedindex_logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/cryptogreedindex_logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
