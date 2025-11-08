@@ -168,8 +168,16 @@ const schemaScripts = [structuredData, ...dataSetSchemas];
 
 const adStyle: CSSProperties = { minHeight: "60px" };
 
-const adProps = {
+const topAdProps = {
   adSlot: "5441357265",
+  adClient: "ca-pub-1332831285527693",
+  adFormat: "auto" as const,
+  className: "w-full",
+  style: adStyle,
+};
+
+const bottomAdProps = {
+  adSlot: "1338535383",
   adClient: "ca-pub-1332831285527693",
   adFormat: "auto" as const,
   className: "w-full",
@@ -185,18 +193,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Header />
             <div className="w-full bg-background/95">
               <div className="mx-auto w-full max-w-6xl px-4 py-4">
-                <AdSenseBanner {...adProps} />
+                <AdSenseBanner {...topAdProps} />
               </div>
             </div>
             <main className="flex-1 min-h-screen">
-              <div className="mx-auto w-full max-w-6xl px-4 py-6">
-                <AdSenseBanner {...adProps} />
-              </div>
               <div className="mx-auto w-full max-w-6xl px-4 pb-6">{children}</div>
-              <div className="mx-auto w-full max-w-6xl px-4 pb-6">
-                <AdSenseBanner {...adProps} />
-              </div>
             </main>
+            <div className="w-full bg-background/95">
+              <div className="mx-auto w-full max-w-6xl px-4 py-4">
+                <AdSenseBanner {...bottomAdProps} />
+              </div>
+            </div>
             <Footer />
           </div>
         </Providers>
