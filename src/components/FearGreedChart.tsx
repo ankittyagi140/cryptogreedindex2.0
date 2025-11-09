@@ -93,13 +93,13 @@ export default function FearGreedChart({
           {typeof indexEntry?.value === "number" && (
           <p className="text-sm text-green-500">
               {t("fearGreedIndexLabel") ?? "Index"}:{" "}
-              {indexEntry.value.toLocaleString()}
+              {indexEntry.value.toLocaleString("en-US")}
           </p>
           )}
           {typeof priceEntry?.value === "number" && (
           <p className="text-sm text-blue-500">
               {t("priceLabel") ?? "Price"}: $
-              {priceEntry.value.toLocaleString()}
+              {priceEntry.value.toLocaleString("en-US")}
           </p>
           )}
         </div>
@@ -109,13 +109,15 @@ export default function FearGreedChart({
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 py-12">
-      <Card className="p-8">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
-          <h2 className="font-display text-3xl font-semibold">{t("chart")}</h2>
-          <div className="flex items-center gap-3">
+    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+      <Card className="p-5 sm:p-8">
+        <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+            {t("chart")}
+          </h2>
+          <div className="flex w-full items-center gap-3 sm:w-auto">
             <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-              <SelectTrigger className="w-32" data-testid="select-crypto">
+              <SelectTrigger className="w-full sm:w-32" data-testid="select-crypto">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -133,7 +135,7 @@ export default function FearGreedChart({
           </div>
         </div>
 
-        <div className="h-96">
+        <div className="h-[320px] sm:h-96">
           {loading ? (
             <Skeleton className="h-full w-full rounded-xl" />
           ) : (

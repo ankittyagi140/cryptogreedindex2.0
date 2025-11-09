@@ -35,9 +35,21 @@ export interface CoinStatsPricePoint {
   price: number;
 }
 
+export interface BtcDominancePoint {
+  timestamp: number;
+  dominance: number;
+}
+
+export interface RainbowPoint {
+  date: string;
+  price: number;
+}
+
+const FALLBACK_BASE_TIMESTAMP = Date.UTC(2024, 0, 1, 0, 0, 0) / 1000;
+
 export function buildFearGreedFallbackData(): CoinStatsFearGreedResponse {
-  const now = Date.now();
-  const seconds = Math.floor(now / 1000);
+  const seconds = FALLBACK_BASE_TIMESTAMP;
+  const iso = new Date(seconds * 1000).toISOString();
 
   return {
     name: "Fear and Greed Index",
@@ -45,7 +57,7 @@ export function buildFearGreedFallbackData(): CoinStatsFearGreedResponse {
       value: 25,
       value_classification: "Extreme Fear",
       timestamp: seconds,
-      update_time: new Date(now).toISOString(),
+      update_time: iso,
     },
     yesterday: {
       value: 24,
@@ -94,8 +106,7 @@ export async function fetchCoinStats<T>(
       "X-API-KEY": apiKey,
       ...headers,
     },
-    // Ensure we don't reuse cached responses unless explicitly set by caller
-    cache: init.cache ?? "no-store",
+    cache: init.cache ?? "force-cache",
   });
 
   if (!response.ok) {
@@ -217,7 +228,7 @@ export function extractFearGreedChartPoints(
 }
 
 export function buildFearGreedChartFallbackData(): CoinStatsFearGreedChartPoint[] {
-  const now = Date.now();
+  const now = FALLBACK_BASE_TIMESTAMP * 1000;
   const day = 24 * 60 * 60 * 1000;
 
   const basePoints = [
@@ -260,6 +271,49 @@ export function buildPriceChartFallbackData(): CoinStatsPricePoint[] {
     timestamp: point.timestamp,
     price: point.price ?? 0,
   }));
+}
+
+const BTC_DOMINANCE_PERIOD_INTERVAL_SECONDS: Record<string, number> = {
+  "24h": 60 * 60,
+  "1w": 6 * 60 * 60,
+  "1m": 12 * 60 * 60,
+  "3m": 24 * 60 * 60,
+  "6m": 24 * 60 * 60,
+  "1y": 24 * 60 * 60,
+  all: 7 * 24 * 60 * 60,
+};
+
+const BTC_DOMINANCE_PERIOD_POINTS: Record<string, number> = {
+  "24h": 24,
+  "1w": 28,
+  "1m": 60,
+  "3m": 90,
+  "6m": 180,
+  "1y": 365,
+  all: 520,
+};
+
+export function buildBtcDominanceFallbackData(
+  period: string,
+): BtcDominancePoint[] {
+  const normalized = BTC_DOMINANCE_PERIOD_POINTS[period] ? period : "1y";
+  const stepSeconds =
+    BTC_DOMINANCE_PERIOD_INTERVAL_SECONDS[normalized] ?? 24 * 60 * 60;
+  const total = BTC_DOMINANCE_PERIOD_POINTS[normalized] ?? 365;
+  const now = FALLBACK_BASE_TIMESTAMP * 1000;
+
+  return Array.from({ length: total }, (_, index) => {
+    const timestamp = Math.floor(
+      (now - (total - index) * stepSeconds * 1000) / 1000,
+    );
+    const base = 47 + 6 * Math.sin(index / 14);
+    const trendAdjustment = (index / total) * 4;
+    const dominance = Number((base + trendAdjustment).toFixed(2));
+    return {
+      timestamp,
+      dominance,
+    };
+  });
 }
 
 export function extractPriceChartPoints(raw: unknown): CoinStatsPricePoint[] {
@@ -410,5 +464,143 @@ function findNearestPrice(
   }
 
   return best?.price;
+}
+
+export function extractBtcDominancePoints(raw: unknown): BtcDominancePoint[] {
+  const arrays: unknown[] = [];
+
+  const addCandidate = (candidate: unknown) => {
+    if (Array.isArray(candidate)) {
+      arrays.push(candidate);
+    }
+  };
+
+  addCandidate(raw);
+
+  if (raw && typeof raw === "object") {
+    const container = raw as Record<string, unknown>;
+    addCandidate(container.data);
+    addCandidate(container.result);
+
+    for (const key of Object.keys(container)) {
+      const value = container[key];
+      if (value && typeof value === "object") {
+        const nested = value as Record<string, unknown>;
+        addCandidate(nested.data);
+      }
+    }
+  }
+
+  if (!arrays.length) {
+    return [];
+  }
+
+  const points: BtcDominancePoint[] = [];
+
+  for (const arr of arrays) {
+    for (const item of arr as unknown[]) {
+      if (Array.isArray(item) && item.length >= 2) {
+        const [ts, dominanceValue] = item;
+        const timestamp = ensureTimestamp(ts);
+        const dominance = ensureNumber(dominanceValue);
+        if (timestamp !== undefined && dominance !== undefined) {
+          points.push({ timestamp, dominance });
+        }
+        continue;
+      }
+
+      if (item && typeof item === "object") {
+        const obj = item as Record<string, unknown>;
+        const timestamp =
+          ensureTimestamp(obj.timestamp) ??
+          ensureTimestamp(obj.time) ??
+          ensureTimestamp(obj.date);
+        const dominance =
+          ensureNumber(obj.dominance) ??
+          ensureNumber(obj.percentage) ??
+          ensureNumber(obj.value);
+
+        if (timestamp !== undefined && dominance !== undefined) {
+          points.push({ timestamp, dominance });
+        }
+      }
+    }
+  }
+
+  return points
+    .filter(
+      (point) =>
+        Number.isFinite(point.timestamp) && Number.isFinite(point.dominance),
+    )
+    .sort((a, b) => a.timestamp - b.timestamp);
+}
+
+export function extractRainbowPoints(raw: unknown): RainbowPoint[] {
+  if (!raw || typeof raw !== "object") {
+    return [];
+  }
+
+  const container = raw as Record<string, unknown>;
+  const arrays: unknown[] = [];
+
+  const addCandidate = (candidate: unknown) => {
+    if (Array.isArray(candidate)) {
+      arrays.push(candidate);
+    }
+  };
+
+  addCandidate(raw);
+  addCandidate(container.data);
+  addCandidate(container.result);
+
+  for (const key of Object.keys(container)) {
+    const value = container[key];
+    if (value && typeof value === "object") {
+      addCandidate((value as Record<string, unknown>).data);
+    }
+  }
+
+  if (!arrays.length) {
+    return [];
+  }
+
+  const points: RainbowPoint[] = [];
+
+  for (const arr of arrays) {
+    for (const entry of arr as unknown[]) {
+      if (!entry || typeof entry !== "object") continue;
+      const obj = entry as Record<string, unknown>;
+      const price = ensureNumber(obj.price);
+      const time = typeof obj.time === "string" ? obj.time : undefined;
+      if (price !== undefined && time) {
+        points.push({ price, date: time });
+      }
+    }
+  }
+
+  return points
+    .filter((point) => Number.isFinite(point.price) && point.date.length > 0)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}
+
+export function buildRainbowFallbackData(coinId: string): RainbowPoint[] {
+  const start = new Date("2013-01-01").getTime();
+  const points: RainbowPoint[] = [];
+
+  for (let i = 0; i < 120; i += 1) {
+    const date = new Date(start + i * 30 * 24 * 60 * 60 * 1000);
+    const yearFactor = i / 12;
+    const base =
+      coinId === "ethereum"
+        ? 50 * Math.exp(yearFactor * 0.18)
+        : 100 * Math.exp(yearFactor * 0.16);
+    const noise = 1 + 0.15 * Math.sin(i / 4);
+    points.push({
+      date: date.toISOString().slice(0, 10),
+      price: Number((base * noise).toFixed(2)),
+    });
+  }
+
+  return points;
 }
 

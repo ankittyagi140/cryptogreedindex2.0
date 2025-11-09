@@ -95,7 +95,15 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
   const updatedAtLabel =
     data?.updatedAt && !Number.isNaN(data.updatedAt)
       ? t("marketOverviewUpdatedAt", {
-          time: new Date(normalizeTimestamp(data.updatedAt)).toLocaleString(),
+          time: new Intl.DateTimeFormat("en-GB", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            timeZone: "UTC",
+          }).format(new Date(normalizeTimestamp(data.updatedAt))),
         })
       : undefined;
 
@@ -161,12 +169,8 @@ function buildCardClass(
   change?: number,
 ) {
   const base = "rounded-2xl border p-5 shadow-sm transition-colors";
-
-  const positive =
-    tone === "rose"
-      ? "border-rose-500/40 bg-rose-500/10"
-      : "border-emerald-500/40 bg-emerald-500/10";
-
+  const positive = "border-emerald-500/40 bg-emerald-500/12";
+  const negative = "border-red-500/40 bg-red-500/12";
   const neutral = "border-border/60 bg-background/60";
 
   if (typeof change === "number") {
@@ -174,15 +178,12 @@ function buildCardClass(
       return `${base} ${positive}`;
     }
     if (change < 0) {
-      if (tone === "emerald") {
-        return `${base} border-red-500/40 bg-red-500/10`;
-      }
-      return `${base} border-rose-500/50 bg-rose-500/15`;
+      return `${base} ${negative}`;
     }
   }
 
   if (tone === "rose") {
-    return `${base} border-rose-500/30 bg-rose-500/10`;
+    return `${base} border-rose-500/30 bg-rose-500/12`;
   }
 
   return `${base} ${neutral}`;

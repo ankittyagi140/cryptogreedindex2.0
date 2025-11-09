@@ -5,6 +5,8 @@ const baseUrl = "https://www.cryptogreedindex.com";
 const staticRoutes = [
   "",
   "coins",
+  "btc-dominance",
+  "btc-rainbow",
   "about",
   "contact",
   "legal/privacy",
@@ -22,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url,
       lastModified,
       changeFrequency: path === "" ? "daily" : "weekly",
-      priority: path === "" ? 1 : 0.6,
+      priority: path === "" ? 1 : path === "coins" ? 0.8 : 0.6,
     };
   });
 }

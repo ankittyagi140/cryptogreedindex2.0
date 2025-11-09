@@ -9,6 +9,7 @@ import Providers from "./providers";
 
 import "./globals.css";
 import AdSenseBanner from "@/components/AdSenseBanner";
+import AdSenseBannerDeferred from "@/components/AdSenseBannerDeferred";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.cryptogreedindex.com"),
@@ -36,9 +37,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/cryptogreedindex_logo.png",
-    shortcut: "/cryptogreedindex_logo.png",
-    apple: "/cryptogreedindex_logo.png",
+    icon: "/cryptogreedindex-logo.png",
+    shortcut: "/cryptogreedindex-logo.png",
+    apple: "/cryptogreedindex-logo.png",
   },
   manifest: "/site.webmanifest",
   openGraph: {
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
       "Monitor the latest crypto fear and greed score, global market capitalization, bitcoin dominance, and top movers with live data refreshed throughout the day.",
     images: [
       {
-        url: "https://www.cryptogreedindex.com/cryptogreedindex_logo.png",
+        url: "https://www.cryptogreedindex.com/cryptogreedindex-logo.png",
         width: 1200,
         height: 630,
         alt: "Crypto Greed Index dashboard preview",
@@ -64,7 +65,7 @@ export const metadata: Metadata = {
     title: "Crypto Greed Index | Real-Time Crypto Sentiment & Market Heatmaps",
     description:
       "Track the crypto fear & greed index, bitcoin dominance, global market cap, and top gainers/losers with live data updated throughout the day.",
-    images: ["https://www.cryptogreedindex.com/cryptogreedindex_logo.png"],
+    images: ["https://www.cryptogreedindex.com/cryptogreedindex-logo.png"],
   },
   robots: {
     index: true,
@@ -106,7 +107,7 @@ const structuredData = {
     url: "https://www.cryptogreedindex.com",
     logo: {
       "@type": "ImageObject",
-      url: "https://www.cryptogreedindex.com/cryptogreedindex_logo.png",
+      url: "https://www.cryptogreedindex.com/cryptogreedindex-logo.png",
     },
   },
   sameAs: [
@@ -166,7 +167,10 @@ const dataSetSchemas = [
 
 const schemaScripts = [structuredData, ...dataSetSchemas];
 
-const adStyle: CSSProperties = { minHeight: "60px" };
+const adStyle: CSSProperties = {
+  minHeight: "clamp(36px, 18vw, 120px)",
+  maxHeight: "140px",
+};
 
 const topAdProps = {
   adSlot: "5441357265",
@@ -192,7 +196,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="flex min-h-screen flex-col">
             <Header />
             <div className="w-full bg-background/95">
-              <div className="mx-auto w-full max-w-6xl px-4 py-4">
+              <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:py-4">
                 <AdSenseBanner {...topAdProps} />
               </div>
             </div>
@@ -200,8 +204,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <div className="mx-auto w-full max-w-6xl px-4 pb-6">{children}</div>
             </main>
             <div className="w-full bg-background/95">
-              <div className="mx-auto w-full max-w-6xl px-4 py-4">
-                <AdSenseBanner {...bottomAdProps} />
+              <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:py-4">
+                <AdSenseBannerDeferred {...bottomAdProps} />
               </div>
             </div>
             <Footer />
@@ -216,7 +220,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-W9J9F0HR2F"
           strategy="afterInteractive"
-          async
         />
         <Script id="cfi-google-analytics" strategy="afterInteractive">
           {`
@@ -227,11 +230,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           `}
         </Script>
         {schemaScripts.map((schema, index) => (
-          <Script
-            key={`structured-data-${index}`}
-            id={`structured-data-${index}`}
+          <script
+            key={`schema-${index}`}
             type="application/ld+json"
-            strategy="afterInteractive"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
           />
         ))}

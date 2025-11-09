@@ -3,6 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { fetchCoinStatsMarket } from "@/lib/coinstats-market";
 import { extractPriceChartPoints } from "@/lib/coinstats";
 
@@ -44,6 +52,7 @@ const DEFAULT_CHART_INTERVAL = "1h";
 export const revalidate = 300;
 
 interface CoinPageProps {
+
   params: Promise<{ id: string }>;
   searchParams?: Promise<{ period?: string; interval?: string; currency?: string }>;
 }
@@ -115,6 +124,26 @@ export default async function CoinDetailPage({
   return (
     <div className="bg-gradient-to-b from-background via-background/95 to-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-12">
+        <Breadcrumb className="text-sm text-muted-foreground">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/coins">Cryptocurrencies</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{coin.name ?? id}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4">
             {coin.icon ? (

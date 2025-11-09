@@ -29,6 +29,14 @@ const productLinks: FooterLink[] = [
     href: "/coins",
   },
   {
+    labelKey: "footerBtcDominance",
+    href: "/btc-dominance",
+  },
+  {
+    labelKey: "footerBtcRainbow",
+    href: "/btc-rainbow",
+  },
+  {
     labelKey: "footerBlog",
     href: "/blog",
   },
@@ -64,18 +72,18 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-border/80 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-      <div className="mx-auto w-full max-w-7xl px-6 py-12">
+      <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
         <div className="grid gap-10 md:grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))]">
           <div className="space-y-4">
             <Link href="/" className="inline-flex items-center gap-2 text-foreground">
               <Image
-                src="/cryptogreedindex_logo.png"
+                src="/cryptogreedindex-logo.png"
                 alt="Crypto Greed Index logo"
                 width={42}
                 height={42}
-                className="rounded-full border border-border/60 bg-background p-1"
+                className="h-9 w-9 rounded-full border border-border/40 bg-background p-0.5"
               />
-              <span className="font-display text-xl font-semibold">
+              <span className="font-display text-lg font-semibold text-yellow-500">
                 {t("title")}
               </span>
             </Link>

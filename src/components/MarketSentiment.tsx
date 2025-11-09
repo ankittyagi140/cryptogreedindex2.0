@@ -26,10 +26,12 @@ export default function MarketSentiment({ data }: MarketSentimentProps) {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-6 py-12">
-      <Card className="p-8">
-        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-          <h2 className="font-display text-3xl font-semibold">{t("marketSentiment")}</h2>
+    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+      <Card className="p-5 sm:p-8">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+            {t("marketSentiment")}
+          </h2>
           {/* <SocialShareMenu
             title={t("marketSentiment")}
             description={t("description")}
@@ -42,7 +44,12 @@ export default function MarketSentiment({ data }: MarketSentimentProps) {
           {data.map((item, index) => (
             <div key={index} className="space-y-2" data-testid={`card-sentiment-${index}`}>
               <p className="text-sm text-muted-foreground uppercase tracking-wide">{item.label}</p>
-              <div className={`text-3xl font-bold tabular-nums ${getSentimentColor(item.value)}`} data-testid={`text-value-${index}`}>
+              <div
+                className={`text-2xl font-bold tabular-nums sm:text-3xl ${getSentimentColor(
+                  item.value,
+                )}`}
+                data-testid={`text-value-${index}`}
+              >
                 {item.value} {item.sentiment}
               </div>
             </div>

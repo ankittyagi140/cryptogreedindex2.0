@@ -19,7 +19,7 @@ type FearGreedChartApiResponse = {
   };
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86_400;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          "Cache-Control": "s-maxage=600, stale-while-revalidate=300",
+          "Cache-Control": "s-maxage=86400, stale-while-revalidate=43200",
         },
       },
     );

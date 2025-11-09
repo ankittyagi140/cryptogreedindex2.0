@@ -26,6 +26,21 @@ export default function AdSenseBanner({
 }: AdSenseBannerProps) {
   const adRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const {
+    minHeight: providedMinHeight,
+    maxHeight: providedMaxHeight,
+    ...styleRest
+  } = style ?? {};
+
+  const defaultMinHeight = "clamp(48px, 22vw, 120px)";
+  const computedMinHeight = providedMinHeight ?? defaultMinHeight;
+  const sharedStyle: CSSProperties = {
+    ...styleRest,
+    minHeight: computedMinHeight,
+  };
+  if (providedMaxHeight) {
+    sharedStyle.maxHeight = providedMaxHeight;
+  }
 
   useEffect(() => {
     let resizeObserver: ResizeObserver | null = null;
@@ -149,16 +164,19 @@ export default function AdSenseBanner({
     <div
       className={`relative ${className}`}
       ref={adRef}
-      style={{ minWidth: "50px", minHeight: "60px", width: "100%", ...style }}
+      style={{
+        minWidth: "50px",
+        width: "100%",
+        ...sharedStyle,
+      }}
     >
       <ins
         className="adsbygoogle"
         style={{
           display: "block",
-          minHeight: "60px",
           minWidth: "50px",
           width: "100%",
-          ...style,
+          ...sharedStyle,
         }}
         data-ad-client={adClient}
         data-ad-slot={adSlot}
@@ -169,7 +187,13 @@ export default function AdSenseBanner({
       <div
         className="absolute inset-0 flex items-center justify-center rounded-xl border border-blue-200/40 bg-gradient-to-r from-blue-50 to-indigo-50 text-xs text-blue-500 transition-opacity duration-300"
         id={`ad-placeholder-${adSlot}`}
-        style={{ opacity: 1, minWidth: "50px", minHeight: "60px" }}
+        style={{
+          opacity: 1,
+          minWidth: "50px",
+          minHeight: computedMinHeight,
+          pointerEvents: "none",
+          ...(providedMaxHeight ? { maxHeight: providedMaxHeight } : {}),
+        }}
       >
         <div className="text-center">
           <div className="text-sm font-semibold">Advertisement</div>

@@ -53,13 +53,23 @@ function getClassificationLabel(
   return t(key);
 }
 
+const timestampFormatter = new Intl.DateTimeFormat("en-GB", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  timeZone: "UTC",
+});
+
 function formatTimestamp(point: CoinStatsFearGreedResponse["now"]) {
   const iso = point.update_time;
   if (iso) {
-    return new Date(iso).toLocaleString();
+    return `${timestampFormatter.format(new Date(iso))} UTC`;
   }
 
-  return new Date(point.timestamp * 1000).toLocaleString();
+  return `${timestampFormatter.format(new Date(point.timestamp * 1000))} UTC`;
 }
 
 export default function FearGreedDashboard() {
@@ -77,9 +87,7 @@ export default function FearGreedDashboard() {
   } = useQuery<FearGreedApiResponse>({
     queryKey: ["fear-greed"],
     queryFn: async () => {
-      const response = await fetch("/api/fear-and-greed", {
-        cache: "no-store",
-      });
+      const response = await fetch("/api/fear-and-greed");
 
       if (!response.ok) {
         throw new Error(await response.text());
@@ -87,8 +95,8 @@ export default function FearGreedDashboard() {
 
       return response.json() as Promise<FearGreedApiResponse>;
     },
-    staleTime: 600_000,
-    refetchInterval: 600_000,
+    staleTime: 86_400_000,
+    refetchInterval: 86_400_000,
   });
 
   const {
@@ -98,9 +106,7 @@ export default function FearGreedDashboard() {
   } = useQuery<FearGreedChartApiResponse>({
     queryKey: ["fear-greed-chart", { period: "1y" }],
     queryFn: async () => {
-      const response = await fetch("/api/fear-and-greed-chart?period=1y", {
-        cache: "no-store",
-      });
+      const response = await fetch("/api/fear-and-greed-chart?period=1y");
 
       if (!response.ok) {
         throw new Error(await response.text());
@@ -108,8 +114,8 @@ export default function FearGreedDashboard() {
 
       return response.json() as Promise<FearGreedChartApiResponse>;
     },
-    staleTime: 600_000,
-    refetchInterval: 600_000,
+    staleTime: 86_400_000,
+    refetchInterval: 86_400_000,
   });
 
   const safeData = data ?? fallbackData;

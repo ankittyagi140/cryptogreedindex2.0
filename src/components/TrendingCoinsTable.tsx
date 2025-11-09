@@ -98,7 +98,15 @@ function renderChange(value: number | null | undefined) {
   );
 }
 
-function Sparkline({ data, color }: { data: number[]; color: string }) {
+function Sparkline({
+  data,
+  color,
+  className,
+}: {
+  data: number[];
+  color: string;
+  className?: string;
+}) {
   if (!data.length) {
     return <div className="text-muted-foreground">—</div>;
   }
@@ -121,7 +129,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
-      className="h-10 w-32"
+      className={className ?? "h-10 w-32"}
       preserveAspectRatio="none"
     >
       <defs>
@@ -321,7 +329,7 @@ export default function TrendingCoinsTable({
         )}
       </div>
 
-      <Card className="overflow-hidden border border-border/60 bg-background/60">
+      <Card className="hidden overflow-hidden border border-border/60 bg-background/60 md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full table-fixed text-sm text-muted-foreground">
             <thead className="bg-secondary/40 text-xs uppercase tracking-wide text-muted-foreground">
@@ -451,6 +459,7 @@ export default function TrendingCoinsTable({
                                 ? "#22c55e"
                                 : "#ef4444"
                             }
+                            className="h-10 w-32"
                           />
                         ) : (
                           <span className="text-muted-foreground">—</span>
@@ -464,13 +473,153 @@ export default function TrendingCoinsTable({
         </div>
       </Card>
 
+      <div className="space-y-4 md:hidden">
+        {isLoading &&
+          Array.from({ length: Math.min(6, effectivePerPage) }).map((_, index) => (
+            <Card
+              key={`mobile-skeleton-${index}`}
+              className="border border-border/60 bg-background/60 p-4"
+            >
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-4 w-12" />
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </Card>
+          ))}
+
+        {!isLoading && isError && (
+          <Card className="border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            {t("tableLoadError")}
+          </Card>
+        )}
+
+        {!isLoading &&
+          !isError &&
+          coins.map((coin) => (
+            <Link
+              key={`mobile-card-${coin.id}`}
+              href={`/coins/${coin.id}`}
+              className="block transition hover:no-underline"
+            >
+              <Card className="group space-y-4 border border-border/60 bg-background/60 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+                <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src={coin.icon}
+                    alt={coin.name}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                  />
+                  <div className="text-left">
+                      <span className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
+                        {coin.name}
+                      </span>
+                    <div className="text-xs uppercase text-muted-foreground">
+                      {coin.symbol}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-xs font-semibold uppercase text-muted-foreground">
+                  #{coin.rank}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {t("tablePrice", { currency: currencyLabel })}
+                  </p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {formatCurrency(coin.price, currencyLabel)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {t("tableChange24h")}
+                  </p>
+                  <div className="mt-1">{renderChange(coin.priceChange1d)}</div>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {t("tableChange7d")}
+                  </p>
+                  <div className="mt-1">{renderChange(coin.priceChange1w)}</div>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {t("tableChange1h")}
+                  </p>
+                  <div className="mt-1">{renderChange(coin.priceChange1h)}</div>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {t("tableMarketCap")}
+                  </p>
+                  <p className="mt-1 font-medium text-foreground">
+                    {typeof coin.marketCap === "number"
+                      ? formatNumberCompact(coin.marketCap, currencyLabel)
+                      : "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">
+                    {t("tableVolume24h")}
+                  </p>
+                  <p className="mt-1 font-medium text-foreground">
+                    {typeof coin.volume === "number"
+                      ? formatNumberCompact(coin.volume, currencyLabel)
+                      : "—"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="border-t border-border/50 pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {t("tablePriceGraph")}
+                </p>
+                <div className="mt-2">
+                  {coin.sparkline.length ? (
+                    <Sparkline
+                      data={coin.sparkline}
+                      color={
+                        coin.sparkline[coin.sparkline.length - 1] -
+                          coin.sparkline[0] >=
+                        0
+                          ? "#22c55e"
+                          : "#ef4444"
+                      }
+                      className="h-10 w-full"
+                    />
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </div>
+              </div>
+              </Card>
+            </Link>
+          ))}
+      </div>
+
       {enablePagination && (
         <div className="mt-6 flex flex-col items-center gap-4 text-sm text-muted-foreground md:flex-row md:justify-between">
           <div className="text-center md:text-left">
             {t("paginationPage", { page: effectivePage })}
             {totalPages ? t("paginationOf", { total: totalPages }) : ""}
             {meta?.itemCount
-              ? t("paginationAssets", { count: meta.itemCount.toLocaleString() })
+              ? t("paginationAssets", {
+                  count: meta.itemCount.toLocaleString("en-US"),
+                })
               : ""}
             {isFetching ? t("paginationUpdating") : ""}
           </div>
