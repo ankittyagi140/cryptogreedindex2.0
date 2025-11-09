@@ -1,6 +1,6 @@
 'use client';
 
-import { CSSProperties, useEffect, useRef } from 'react';
+import { CSSProperties, useEffect, useRef, useState } from 'react';
 
 interface AdSenseBannerProps {
   adSlot: string;
@@ -26,6 +26,7 @@ export default function AdSenseBanner({
 }: AdSenseBannerProps) {
   const adRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
+  const [isPlaceholderVisible, setPlaceholderVisible] = useState(true);
   const {
     minHeight: providedMinHeight,
     maxHeight: providedMaxHeight,
@@ -45,6 +46,22 @@ export default function AdSenseBanner({
   useEffect(() => {
     let resizeObserver: ResizeObserver | null = null;
 
+    let isCancelled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+    let pollingInterval: ReturnType<typeof setInterval> | null = null;
+
+    const hidePlaceholder = () => {
+      if (!isCancelled) {
+        setPlaceholderVisible((prev) => (prev ? false : prev));
+      }
+    };
+
+    const showPlaceholder = () => {
+      if (!isCancelled) {
+        setPlaceholderVisible(true);
+      }
+    };
+
     const initializeAdSense = () => {
       if (initialized.current) return;
 
@@ -54,8 +71,7 @@ export default function AdSenseBanner({
 
       if (typeof window !== "undefined" && window.adSenseInitialized?.has(adSlot)) {
         initialized.current = true;
-        const placeholder = document.getElementById(`ad-placeholder-${adSlot}`);
-        if (placeholder) placeholder.style.opacity = "0";
+        hidePlaceholder();
         return;
       }
 
@@ -88,8 +104,7 @@ export default function AdSenseBanner({
 
           if (alreadyLoaded) {
             initialized.current = true;
-            const placeholder = document.getElementById(`ad-placeholder-${adSlot}`);
-            if (placeholder) placeholder.style.opacity = "0";
+            hidePlaceholder();
             return;
           }
         }
@@ -101,19 +116,26 @@ export default function AdSenseBanner({
           }
           (window.adsbygoogle = window.adsbygoogle || []).push({});
           setTimeout(() => {
-            const placeholder = document.getElementById(`ad-placeholder-${adSlot}`);
-            if (placeholder) placeholder.style.opacity = "0";
+            hidePlaceholder();
           }, 2_000);
         } catch (error) {
           console.error("AdSenseBanner: initialization error", error);
           initialized.current = false;
-          const placeholder = document.getElementById(`ad-placeholder-${adSlot}`);
-          if (placeholder) placeholder.style.opacity = "1";
+          showPlaceholder();
         }
       } else {
-        setTimeout(() => {
-          const placeholder = document.getElementById(`ad-placeholder-${adSlot}`);
-          if (placeholder) placeholder.style.opacity = "1";
+        retryTimer = setTimeout(() => {
+          showPlaceholder();
+          if (!pollingInterval) {
+            pollingInterval = setInterval(() => {
+              if (!initialized.current) {
+                initializeAdSense();
+              } else if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+              }
+            }, 2_000);
+          }
         }, 1_500);
       }
     };
@@ -155,8 +177,15 @@ export default function AdSenseBanner({
     }
 
     return () => {
+      isCancelled = true;
       initialized.current = false;
       if (resizeObserver) resizeObserver.disconnect();
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+      }
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
     };
   }, [adSlot]);
 
@@ -186,12 +215,12 @@ export default function AdSenseBanner({
 
       <div
         className="absolute inset-0 flex items-center justify-center rounded-xl border border-blue-200/40 bg-gradient-to-r from-blue-50 to-indigo-50 text-xs text-blue-500 transition-opacity duration-300"
-        id={`ad-placeholder-${adSlot}`}
         style={{
-          opacity: 1,
+          opacity: isPlaceholderVisible ? 1 : 0,
           minWidth: "50px",
           minHeight: computedMinHeight,
           pointerEvents: "none",
+          visibility: isPlaceholderVisible ? "visible" : "hidden",
           ...(providedMaxHeight ? { maxHeight: providedMaxHeight } : {}),
         }}
       >
