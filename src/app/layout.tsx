@@ -8,7 +8,6 @@ import Header from "@/components/Header";
 import Providers from "./providers";
 
 import "./globals.css";
-import AdSenseBanner from "@/components/AdSenseBanner";
 import AdSenseBannerDeferred from "@/components/AdSenseBannerDeferred";
 
 export const metadata: Metadata = {
@@ -172,13 +171,7 @@ const adStyle: CSSProperties = {
   maxHeight: "140px",
 };
 
-const topAdProps = {
-  adSlot: "5441357265",
-  adClient: "ca-pub-1332831285527693",
-  adFormat: "auto" as const,
-  className: "w-full",
-  style: adStyle,
-};
+
 
 const bottomAdProps = {
   adSlot: "1338535383",
@@ -195,11 +188,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Header />
-            <div className="w-full bg-background/95">
-              <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:py-4">
-                <AdSenseBanner {...topAdProps} />
-              </div>
-            </div>
+         
             <main className="flex-1 min-h-screen">
               <div className="mx-auto w-full max-w-6xl px-4 pb-6">{children}</div>
             </main>

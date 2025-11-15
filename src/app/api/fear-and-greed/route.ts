@@ -13,7 +13,7 @@ type FearGreedApiResponse = CoinStatsFearGreedResponse & {
   };
 };
 
-export const revalidate = 86_400;
+export const revalidate = 14_400;
 
 export async function GET() {
   try {
@@ -26,7 +26,7 @@ export async function GET() {
       {
       status: 200,
         headers: {
-          "Cache-Control": "s-maxage=86400, stale-while-revalidate=43200",
+          "Cache-Control": "s-maxage=14400, stale-while-revalidate=7200",
         },
       },
     );

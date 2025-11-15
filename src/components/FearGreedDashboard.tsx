@@ -95,8 +95,9 @@ export default function FearGreedDashboard() {
 
       return response.json() as Promise<FearGreedApiResponse>;
     },
-    staleTime: 86_400_000,
-    refetchInterval: 86_400_000,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchInterval: 14_400_000,
   });
 
   const {
@@ -114,8 +115,9 @@ export default function FearGreedDashboard() {
 
       return response.json() as Promise<FearGreedChartApiResponse>;
     },
-    staleTime: 86_400_000,
-    refetchInterval: 86_400_000,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchInterval: 14_400_000,
   });
 
   const safeData = data ?? fallbackData;

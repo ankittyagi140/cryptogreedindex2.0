@@ -60,9 +60,9 @@ export default function BtcDominancePageContent() {
 
   const changeBadgeClass =
     summaryTone === "positive"
-      ? "bg-emerald-500/20 text-emerald-300"
+      ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
       : summaryTone === "negative"
-      ? "bg-rose-500/20 text-rose-300"
+      ? "bg-rose-500/15 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200"
       : "bg-border/50 text-muted-foreground";
 
   const changeBadgeLabel =
@@ -1119,24 +1119,24 @@ export default function BtcDominancePageContent() {
 
     if (summaryTone === "positive") {
       return {
-        container: `${base} border-emerald-500/40 bg-emerald-500/10`,
-        label: "text-emerald-100/80",
-        value: "text-emerald-50",
-        subtext: "text-emerald-100/80",
+        container: `${base} border-emerald-200 bg-emerald-500/10 dark:border-emerald-500/40`,
+        label: "text-emerald-700 dark:text-emerald-100/80",
+        value: "text-emerald-800 dark:text-emerald-50",
+        subtext: "text-emerald-700/80 dark:text-emerald-100/80",
       };
     }
 
     if (summaryTone === "negative") {
       return {
-        container: `${base} border-rose-500/40 bg-rose-500/10`,
-        label: "text-rose-100/80",
-        value: "text-rose-50",
-        subtext: "text-rose-100/80",
+        container: `${base} border-rose-200 bg-rose-500/10 dark:border-rose-500/40`,
+        label: "text-rose-700 dark:text-rose-100/80",
+        value: "text-rose-800 dark:text-rose-50",
+        subtext: "text-rose-700/80 dark:text-rose-100/80",
       };
     }
 
     return {
-      container: `${base} border-border/60 bg-background/70`,
+      container: `${base} border-border/60 bg-background/80`,
       label: "text-muted-foreground/80",
       value: "text-foreground",
       subtext: "text-muted-foreground/80",

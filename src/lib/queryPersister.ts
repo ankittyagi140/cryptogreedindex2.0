@@ -1,7 +1,7 @@
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import type { Persister } from "@tanstack/react-query-persist-client";
 
-const STORAGE_KEY = "cfi-react-query-cache-v1";
+const STORAGE_KEY = "cfi-react-query-cache-v2";
 
 function createMemoryStorage(): Storage {
   const store = new Map<string, string>();
@@ -32,5 +32,5 @@ export const queryCachePersister: Persister = createSyncStoragePersister({
   key: STORAGE_KEY,
 });
 
-export const QUERY_CACHE_MAX_AGE = 86_400_000; // 24 hours
+export const QUERY_CACHE_MAX_AGE = 14_400_000; // 4 hours
 

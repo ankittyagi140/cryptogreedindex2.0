@@ -17,6 +17,19 @@ export default function Providers({ children }: { children: ReactNode }) {
       persistOptions={{
         persister: queryCachePersister,
         maxAge: QUERY_CACHE_MAX_AGE,
+        dehydrateOptions: {
+          shouldDehydrateQuery: (query) => {
+            // Exclude fear and greed queries from persistence to prevent stale values
+            const queryKey = query.queryKey[0];
+            if (
+              queryKey === "fear-greed" ||
+              queryKey === "fear-greed-chart"
+            ) {
+              return false;
+            }
+            return true;
+          },
+        },
       }}
     >
       <ThemeProvider>

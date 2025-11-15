@@ -19,7 +19,7 @@ type FearGreedChartApiResponse = {
   };
 };
 
-export const revalidate = 86_400;
+export const revalidate = 14_400;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          "Cache-Control": "s-maxage=86400, stale-while-revalidate=43200",
+          "Cache-Control": "s-maxage=14400, stale-while-revalidate=7200",
         },
       },
     );
