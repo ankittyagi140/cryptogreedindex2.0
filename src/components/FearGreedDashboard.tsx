@@ -7,6 +7,7 @@ import FearGreedChart from "@/components/FearGreedChart";
 import FearGreedGauge from "@/components/FearGreedGauge";
 import MarketSentiment from "@/components/MarketSentiment";
 import FearGreedDashboardSkeleton from "@/components/FearGreedDashboardSkeleton";
+import AdSenseBanner from "@/components/AdSenseBanner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
   buildFearGreedFallbackData,
@@ -87,7 +88,12 @@ export default function FearGreedDashboard() {
   } = useQuery<FearGreedApiResponse>({
     queryKey: ["fear-greed"],
     queryFn: async () => {
-      const response = await fetch("/api/fear-and-greed");
+      const response = await fetch("/api/fear-and-greed", {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(await response.text());
@@ -96,8 +102,9 @@ export default function FearGreedDashboard() {
       return response.json() as Promise<FearGreedApiResponse>;
     },
     staleTime: 0,
+    gcTime: 0,
     refetchOnMount: true,
-    refetchInterval: 14_400_000,
+    refetchOnWindowFocus: true,
   });
 
   const {
@@ -107,7 +114,12 @@ export default function FearGreedDashboard() {
   } = useQuery<FearGreedChartApiResponse>({
     queryKey: ["fear-greed-chart", { period: "1y" }],
     queryFn: async () => {
-      const response = await fetch("/api/fear-and-greed-chart?period=1y");
+      const response = await fetch("/api/fear-and-greed-chart?period=1y", {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(await response.text());
@@ -116,8 +128,9 @@ export default function FearGreedDashboard() {
       return response.json() as Promise<FearGreedChartApiResponse>;
     },
     staleTime: 0,
+    gcTime: 0,
     refetchOnMount: true,
-    refetchInterval: 14_400_000,
+    refetchOnWindowFocus: true,
   });
 
   const safeData = data ?? fallbackData;
@@ -189,9 +202,14 @@ export default function FearGreedDashboard() {
           />
           <MarketSentiment data={sentimentData} />
           {showFallbackNotice && (
-            <div className="mx-auto max-w-3xl rounded-md border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-              {t("fallbackNotice") ??
-                "Live fear and greed data is currently unavailable. Showing the most recent cached values."}
+            <div className="mx-auto w-full max-w-3xl px-4 py-4">
+              <AdSenseBanner
+                adSlot="9708814146"
+                adClient="ca-pub-1332831285527693"
+                adFormat="auto"
+                className="w-full"
+                style={{ minHeight: "50px", maxHeight: "160px" }}
+              />
             </div>
           )}
           <FearGreedChart data={chartData} loading={showChartSkeleton} />

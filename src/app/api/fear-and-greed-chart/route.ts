@@ -19,8 +19,6 @@ type FearGreedChartApiResponse = {
   };
 };
 
-export const revalidate = 14_400;
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const period = searchParams.get("period") ?? "1y";
@@ -64,7 +62,9 @@ export async function GET(request: Request) {
       {
         status: 200,
         headers: {
-          "Cache-Control": "s-maxage=14400, stale-while-revalidate=7200",
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0",
         },
       },
     );
@@ -74,13 +74,22 @@ export async function GET(request: Request) {
     const message = error instanceof Error ? error.message : "Unknown error";
     const fallbackPoints = buildFearGreedChartFallbackData();
 
-    return NextResponse.json<FearGreedChartApiResponse>({
-      points: fallbackPoints,
-      source: "fallback",
-      meta: {
-        error: message,
+    return NextResponse.json<FearGreedChartApiResponse>(
+      {
+        points: fallbackPoints,
+        source: "fallback",
+        meta: {
+          error: message,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      },
+    );
   }
 }
 

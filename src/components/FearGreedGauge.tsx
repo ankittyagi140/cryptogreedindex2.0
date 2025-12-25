@@ -1,8 +1,6 @@
 "use client";
 
 import { useLanguage } from "@/contexts/LanguageContext";
-import type { CSSProperties } from "react";
-import AdSenseBanner from "./AdSenseBanner";
 
 interface FearGreedGaugeProps {
   value: number;
@@ -30,19 +28,6 @@ export default function FearGreedGauge({ value, lastUpdated }: FearGreedGaugePro
 
   const angle = (value / 100) * 240 - 120;
 
-  const adStyle: CSSProperties = {
-    minHeight: "clamp(36px, 18vw, 120px)",
-    maxHeight: "140px",
-  };
-
-  const topAdProps = {
-    adSlot: "5441357265",
-    adClient: "ca-pub-1332831285527693",
-    adFormat: "auto" as const,
-    className: "w-full",
-    style: adStyle,
-  };
-
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-12 text-center sm:gap-8 sm:px-6 sm:py-16">
       <div className="w-full max-w-3xl">
@@ -53,11 +38,7 @@ export default function FearGreedGauge({ value, lastUpdated }: FearGreedGaugePro
           {t("description")}
         </p>
       </div>
-   <div className="w-full bg-background/95">
-              <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:py-4">
-                <AdSenseBanner {...topAdProps} />
-              </div>
-            </div>
+  
       <div
         className="relative w-full max-w-[340px] sm:max-w-[420px]"
         style={{ aspectRatio: "400 / 280" }}

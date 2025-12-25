@@ -13,8 +13,6 @@ type FearGreedApiResponse = CoinStatsFearGreedResponse & {
   };
 };
 
-export const revalidate = 14_400;
-
 export async function GET() {
   try {
     const data = await fetchCoinStats<CoinStatsFearGreedResponse>(
@@ -24,9 +22,11 @@ export async function GET() {
     return NextResponse.json<FearGreedApiResponse>(
       { ...data, source: "coinstats" },
       {
-      status: 200,
+        status: 200,
         headers: {
-          "Cache-Control": "s-maxage=14400, stale-while-revalidate=7200",
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0",
         },
       },
     );
@@ -37,13 +37,22 @@ export async function GET() {
 
     const fallback = buildFearGreedFallbackData();
 
-    return NextResponse.json<FearGreedApiResponse>({
-      ...fallback,
-      source: "fallback",
-      meta: {
-        error: message,
+    return NextResponse.json<FearGreedApiResponse>(
+      {
+        ...fallback,
+        source: "fallback",
+        meta: {
+          error: message,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      },
+    );
   }
 }
 
