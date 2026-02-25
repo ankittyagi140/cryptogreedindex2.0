@@ -68,10 +68,10 @@ export default function FearGreedChart({
   const CustomTooltip = ({
     active,
     payload,
-  }: TooltipProps<number, string>) => {
+  }: any) => {
     if (active && payload && payload.length) {
-      const indexEntry = payload.find((item) => item.dataKey === "fear");
-      const priceEntry = payload.find((item) => item.dataKey === "price");
+      const indexEntry = payload.find((item: any) => item.dataKey === "fear");
+      const priceEntry = payload.find((item: any) => item.dataKey === "price");
       const classificationLabel =
         indexEntry?.payload?.classificationLabel ??
         indexEntry?.payload?.classificationKey;

@@ -171,7 +171,7 @@ export default function RainbowChart() {
                 }
               />
               <Tooltip
-                content={({ active, payload }) => {
+                content={({ active, payload }: any) => {
                   if (active && payload?.length) {
                     const entry = payload[0].payload as (typeof chartData)[number];
                     return (
