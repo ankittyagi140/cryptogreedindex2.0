@@ -39,8 +39,8 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
 
       return (await response.json()) as MarketOverviewResponse;
     },
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
   });
 
   const metrics = useMemo(() => {
@@ -54,7 +54,7 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
         label: t("tableMarketCap"),
         value: data.marketCap,
         change: data.marketCapChange24h,
-        formatter: (value: number) => formatCurrency(value, data.currency),
+        formatter: (value: number) => formatCurrency(value, data.currency, { notation: "compact", maximumFractionDigits: 2 }),
         tone: "emerald" as const,
       },
       {
@@ -62,7 +62,7 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
         label: t("tableVolume24h"),
         value: data.volume24h,
         change: data.volumeChange24h,
-        formatter: (value: number) => formatCurrency(value, data.currency),
+        formatter: (value: number) => formatCurrency(value, data.currency, { notation: "compact", maximumFractionDigits: 2 }),
         tone: "emerald" as const,
       },
       {
@@ -95,43 +95,44 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
   const updatedAtLabel =
     data?.updatedAt && !Number.isNaN(data.updatedAt)
       ? t("marketOverviewUpdatedAt", {
-          time: new Intl.DateTimeFormat("en-GB", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            timeZone: "UTC",
-          }).format(new Date(normalizeTimestamp(data.updatedAt))),
-        })
+        time: new Intl.DateTimeFormat("en-GB", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "UTC",
+        }).format(new Date(normalizeTimestamp(data.updatedAt))),
+      })
       : undefined;
 
   return (
-    <section className="mt-10 space-y-6">
-      <div>
-        <h2 className="font-display text-2xl font-semibold text-foreground">{t("marketOverviewTitle")}</h2>
-        <p className="mt-2 text-sm text-muted-foreground">{t("marketOverviewSubtitle")}</p>
-        <p className="mt-4 text-sm text-muted-foreground">{summary}</p>
+    <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
+      <div className="mb-8">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{t("marketOverviewTitle")}</h2>
+        <p className="mt-1.5 text-sm text-muted-foreground">{t("marketOverviewSubtitle")}</p>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground/80">{summary}</p>
         {updatedAtLabel && (
-          <p className="mt-2 text-xs uppercase tracking-wide text-muted-foreground/80">
+          <div className="mt-3 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+            <span className="h-1 w-1 rounded-full bg-emerald-500 animate-pulse" />
             {updatedAtLabel}
-          </p>
+          </div>
         )}
       </div>
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <Card key={`market-overview-skeleton-${index}`} className="border border-border/60 bg-background/60 p-5">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="mt-4 h-8 w-32" />
-              <Skeleton className="mt-3 h-5 w-20" />
+            <Card key={`market-overview-skeleton-${index}`} className="border-border/40 bg-card/50 p-6 backdrop-blur">
+              <Skeleton className="h-4 w-24 rounded" />
+              <Skeleton className="mt-4 h-9 w-32 rounded-lg" />
+              <Skeleton className="mt-4 h-6 w-20 rounded-full" />
             </Card>
           ))}
         </div>
       ) : isError || !data ? (
-        <Card className="border border-destructive/40 bg-destructive/10 p-6 text-sm text-destructive">
+        <Card className="border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive backdrop-blur">
           {t("marketOverviewError")}
         </Card>
       ) : (
@@ -139,23 +140,29 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
           {metrics.map((metric) => (
             <Card
               key={metric.key}
-              className={buildCardClass(metric.tone, metric.change)}
+              className={`relative overflow-hidden border-border/40 bg-card/60 p-5 backdrop-blur transition-all duration-300 hover:border-border/80 hover:shadow-lg ${buildCardClass()}`}
             >
-              <div className="text-sm font-medium text-muted-foreground">{metric.label}</div>
-              <div className="text-2xl font-semibold text-foreground">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{metric.label}</div>
+              <div className="mt-2 text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl tabular-nums">
                 {typeof metric.value === "number"
                   ? metric.formatter(metric.value)
                   : "—"}
               </div>
               <div className="mt-4">
                 {typeof metric.change === "number" ? (
-                  <span className={buildChangeBadge(metric.change)}>
-                    {formatSignedPercent(metric.change)}
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold ${buildChangeBadge(metric.change)}`}>
+                    {metric.change > 0 ? "▲" : metric.change < 0 ? "▼" : ""} {Math.abs(metric.change).toFixed(2)}%
                   </span>
                 ) : (
-                  <span className="text-sm text-muted-foreground">—</span>
+                  <span className="text-xs font-medium text-muted-foreground">—</span>
                 )}
               </div>
+
+              {/* Subtle background accent */}
+              <div
+                className="absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-[0.03] blur-3xl pointer-events-none"
+                style={{ backgroundColor: metric.change && metric.change > 0 ? '#10b981' : metric.change && metric.change < 0 ? '#f43f5e' : 'currentColor' }}
+              />
             </Card>
           ))}
         </div>
@@ -164,41 +171,21 @@ export default function MarketOverview({ currency = "USD" }: MarketOverviewProps
   );
 }
 
-function buildCardClass(
-  tone: "emerald" | "rose",
-  change?: number,
-) {
-  const base = "rounded-2xl border p-5 shadow-sm transition-colors";
-  const positive = "border-emerald-500/40 bg-emerald-500/12";
-  const negative = "border-red-500/40 bg-red-500/12";
-  const neutral = "border-border/60 bg-background/60";
-
-  if (typeof change === "number") {
-    if (change > 0) {
-      return `${base} ${positive}`;
-    }
-    if (change < 0) {
-      return `${base} ${negative}`;
-    }
-  }
-
-  if (tone === "rose") {
-    return `${base} border-rose-500/30 bg-rose-500/12`;
-  }
-
-  return `${base} ${neutral}`;
+function buildCardClass() {
+  // We handle the background glow via inline styles now for more precision
+  return "";
 }
 
 function buildChangeBadge(value: number) {
   if (value > 0) {
-    return "inline-flex items-center rounded-full bg-emerald-500/15 px-2 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/30";
+    return "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20";
   }
 
   if (value < 0) {
-    return "inline-flex items-center rounded-full bg-red-500/15 px-2 py-1 text-xs font-semibold text-red-400 ring-1 ring-inset ring-red-500/30";
+    return "bg-rose-500/10 text-rose-500 border border-rose-500/20";
   }
 
-  return "inline-flex items-center rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground/80";
+  return "bg-muted text-muted-foreground border border-border/40";
 }
 
 function formatCurrency(
@@ -240,5 +227,3 @@ function normalizeTimestamp(value: number) {
   // Handle seconds vs milliseconds
   return value > 1_000_000_000_000 ? value : value * 1000;
 }
-
-

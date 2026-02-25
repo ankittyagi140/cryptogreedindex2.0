@@ -75,32 +75,39 @@ export default function FearGreedChart({
       const classificationLabel =
         indexEntry?.payload?.classificationLabel ??
         indexEntry?.payload?.classificationKey;
+      const classColor = getColor(indexEntry?.payload?.classificationKey);
       return (
-        <div className="rounded-md border border-card-border bg-card p-3 shadow-lg">
-          <p className="mb-1 text-sm font-medium">
+        <div className="rounded-xl border border-border/60 bg-card/95 p-3.5 shadow-xl backdrop-blur-sm">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {indexEntry?.payload?.date}
           </p>
           {classificationLabel && (
-            <p
-              className="text-sm font-semibold"
-              style={{
-                color: getColor(indexEntry?.payload?.classificationKey),
-              }}
-            >
-              {classificationLabel}
-            </p>
+            <div className="mb-2 flex items-center gap-2">
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: classColor }}
+              />
+              <span
+                className="text-sm font-bold"
+                style={{ color: classColor }}
+              >
+                {classificationLabel}
+              </span>
+            </div>
           )}
           {typeof indexEntry?.value === "number" && (
-          <p className="text-sm text-green-500">
-              {t("fearGreedIndexLabel") ?? "Index"}:{" "}
-              {indexEntry.value.toLocaleString("en-US")}
-          </p>
+            <p className="text-sm text-foreground">
+              <span className="text-muted-foreground">{t("fearGreedIndexLabel") ?? "Index"}:</span>{" "}
+              <span className="font-semibold">{indexEntry.value}</span>
+            </p>
           )}
           {typeof priceEntry?.value === "number" && (
-          <p className="text-sm text-blue-500">
-              {t("priceLabel") ?? "Price"}: $
-              {priceEntry.value.toLocaleString("en-US")}
-          </p>
+            <p className="text-sm text-foreground">
+              <span className="text-muted-foreground">{t("priceLabel") ?? "Price"}:</span>{" "}
+              <span className="font-semibold text-blue-400">
+                ${priceEntry.value.toLocaleString("en-US")}
+              </span>
+            </p>
           )}
         </div>
       );
@@ -109,29 +116,26 @@ export default function FearGreedChart({
   };
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
-      <Card className="p-5 sm:p-8">
-        <div className="mb-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="font-display text-2xl font-semibold sm:text-3xl">
-            {t("chart")}
-          </h2>
+    <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
+      <Card className="border-border/50 bg-card/80 p-5 backdrop-blur sm:p-8">
+        <div className="mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              {t("chart")}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Historical fear &amp; greed index with price overlay
+            </p>
+          </div>
           <div className="flex w-full items-center gap-3 sm:w-auto">
             <Select value={selectedCrypto} onValueChange={setSelectedCrypto}>
-              <SelectTrigger className="w-full sm:w-32" data-testid="select-crypto">
+              <SelectTrigger className="w-full rounded-lg sm:w-32" data-testid="select-crypto">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                  <SelectItem value="BTC">☀️ BTC</SelectItem>
-                  {/* <SelectItem value="ETH">💎 ETH</SelectItem>
-                  <SelectItem value="SOL"> SOL</SelectItem> */}
+                <SelectItem value="BTC">BTC</SelectItem>
               </SelectContent>
             </Select>
-            {/* <SocialShareMenu
-              title={t("chart")}
-              description={t("description")}
-              variant="outline"
-              size="sm"
-            /> */}
           </div>
         </div>
 
@@ -139,62 +143,74 @@ export default function FearGreedChart({
           {loading ? (
             <Skeleton className="h-full w-full rounded-xl" />
           ) : (
-          <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={data}>
                 <CartesianGrid
                   stroke="hsl(var(--border))"
                   strokeDasharray="3 3"
+                  opacity={0.5}
                 />
-              <XAxis
-                dataKey="date"
-                  fontSize={12}
-                stroke="hsl(var(--muted-foreground))"
-              />
-              <YAxis
-                yAxisId="left"
-                  fontSize={12}
-                stroke="hsl(var(--muted-foreground))"
+                <XAxis
+                  dataKey="date"
+                  fontSize={11}
+                  stroke="hsl(var(--muted-foreground))"
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  yAxisId="left"
+                  fontSize={11}
+                  stroke="hsl(var(--muted-foreground))"
                   domain={[0, 100]}
-              />
+                  tickLine={false}
+                  axisLine={false}
+                />
                 {hasPrice && (
-              <YAxis
-                yAxisId="right"
-                    fontSize={12}
-                orientation="right"
-                stroke="hsl(var(--muted-foreground))"
-                tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-              />
+                  <YAxis
+                    yAxisId="right"
+                    fontSize={11}
+                    orientation="right"
+                    stroke="hsl(var(--muted-foreground))"
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    tickLine={false}
+                    axisLine={false}
+                  />
                 )}
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: "hsl(var(--muted))", opacity: 0.3 }} />
+                <Legend
+                  wrapperStyle={{ paddingTop: 16 }}
+                  iconType="circle"
+                  iconSize={8}
+                />
                 <Bar
                   dataKey="fear"
                   name={t("fearGreedIndexLabel") ?? "Index"}
-                yAxisId="left"
-                  radius={[6, 6, 0, 0]}
-                  barSize={16}
+                  yAxisId="left"
+                  radius={[4, 4, 0, 0]}
+                  barSize={14}
                   isAnimationActive={false}
                 >
                   {data.map((entry, index) => (
                     <Cell
                       key={`cell-${entry.date}-${index}`}
                       fill={getColor(entry.classificationKey)}
+                      opacity={0.85}
                     />
                   ))}
                 </Bar>
                 {hasPrice && (
-              <Line
-                dataKey="price"
+                  <Line
+                    dataKey="price"
                     dot={false}
                     name={t("priceLabel") ?? "Price"}
                     stroke="#60a5fa"
-                strokeWidth={2}
+                    strokeWidth={2.5}
                     type="monotone"
                     yAxisId="right"
-              />
+                  />
                 )}
               </ComposedChart>
-          </ResponsiveContainer>
+            </ResponsiveContainer>
           )}
         </div>
       </Card>

@@ -67,16 +67,23 @@ const factorItems = [
 function SectionHeading({
   title,
   subtitle,
+  badge,
 }: {
   title: string;
   subtitle: string;
+  badge?: string;
 }) {
   return (
     <div className="max-w-xl">
-      <h2 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+      {badge && (
+        <span className="mb-3 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
+          {badge}
+        </span>
+      )}
+      <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
         {title}
       </h2>
-      <p className="mt-4 text-muted-foreground">{subtitle}</p>
+      <p className="mt-3 leading-relaxed text-muted-foreground">{subtitle}</p>
     </div>
   );
 }
@@ -85,26 +92,37 @@ export default function KnowledgeSections() {
   const { t } = useLanguage();
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-6 py-16 lg:py-20">
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
+    <section className="mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:py-20">
+      {/* FAQ Section */}
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
         <SectionHeading
           title={t("knowledgeFaqTitle")}
           subtitle={t("knowledgeFaqSubtitle")}
+          badge="FAQ"
         />
 
         <Accordion
           type="single"
           collapsible
-          className="rounded-xl border border-border bg-background/50"
+          className="overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur"
         >
-          {faqItems.map((item) => (
-            <AccordionItem key={item.id} value={item.id}>
-              <AccordionTrigger className="px-6 text-left text-base font-medium">
-                {t(item.titleKey)}
+          {faqItems.map((item, index) => (
+            <AccordionItem
+              key={item.id}
+              value={item.id}
+              className={index === 0 ? "" : "border-t border-border/40"}
+            >
+              <AccordionTrigger className="px-6 text-left text-base font-medium hover:no-underline">
+                <span className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold text-primary">
+                    {index + 1}
+                  </span>
+                  {t(item.titleKey)}
+                </span>
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-sm text-muted-foreground">
-                {item.bodyKeys.map((key, index) => (
-                  <p key={key} className={index === 0 ? undefined : "mt-3"}>
+              <AccordionContent className="px-6 pb-5 pl-16 text-sm leading-relaxed text-muted-foreground">
+                {item.bodyKeys.map((key, i) => (
+                  <p key={key} className={i === 0 ? undefined : "mt-3"}>
                     {t(key)}
                   </p>
                 ))}
@@ -114,23 +132,34 @@ export default function KnowledgeSections() {
         </Accordion>
       </div>
 
-      <div className="mt-16 grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
+      {/* Factors Section */}
+      <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start">
         <SectionHeading
           title={t("knowledgeFactorsTitle")}
           subtitle={t("knowledgeFactorsSubtitle")}
+          badge="How It Works"
         />
 
         <Accordion
           type="single"
           collapsible
-          className="rounded-xl border border-border bg-background/50"
+          className="overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur"
         >
-          {factorItems.map((item) => (
-            <AccordionItem key={item.id} value={item.id}>
-              <AccordionTrigger className="px-6 text-left text-base font-medium">
-                {t(item.titleKey)}
+          {factorItems.map((item, index) => (
+            <AccordionItem
+              key={item.id}
+              value={item.id}
+              className={index === 0 ? "" : "border-t border-border/40"}
+            >
+              <AccordionTrigger className="px-6 text-left text-base font-medium hover:no-underline">
+                <span className="flex items-center gap-3">
+                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-muted text-xs font-bold text-muted-foreground">
+                    {index + 1}
+                  </span>
+                  {t(item.titleKey)}
+                </span>
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-sm text-muted-foreground">
+              <AccordionContent className="px-6 pb-5 pl-16 text-sm leading-relaxed text-muted-foreground">
                 <p>{t(item.bodyKey)}</p>
               </AccordionContent>
             </AccordionItem>
@@ -140,4 +169,3 @@ export default function KnowledgeSections() {
     </section>
   );
 }
-

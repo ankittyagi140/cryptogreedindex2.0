@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto w-full max-w-7xl px-6 py-16">
-      <h1 className="font-display text-4xl font-bold text-foreground md:text-5xl">
+    <div className="mx-auto w-full max-w-7xl px-6 py-12">
+      <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
         About CryptoGreedIndex.com
       </h1>
       <section className="mt-6 space-y-4 text-muted-foreground">
@@ -27,11 +27,11 @@ export default function AboutPage() {
         </p>
       </section>
 
-      <section className="mt-10 space-y-3">
-        <h2 className="font-display text-2xl font-semibold text-foreground">
+      <section className="mt-8 space-y-3">
+        <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           Key Features
         </h2>
-        <ul className="list-disc space-y-2 pl-6 text-muted-foreground">
+        <ul className="list-disc space-y-2 pl-6 text-sm text-muted-foreground">
           <li>
             <strong>Fear &amp; Greed Index:</strong> Track the market’s emotional state
             with daily updates.
@@ -67,28 +67,28 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section className="mt-10 space-y-3">
-        <h2 className="font-display text-2xl font-semibold text-foreground">
+      <section className="mt-8 space-y-3">
+        <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           Data Sources
         </h2>
         <p className="text-muted-foreground">
           We rely on trusted providers to ensure data accuracy:
         </p>
-        <ul className="list-disc space-y-2 pl-6 text-muted-foreground">
+        <ul className="list-disc space-y-2 pl-6 text-sm text-muted-foreground">
           <li>CoinStats API for market data, prices, and market cap metrics.</li>
           <li>Alternative.me API for Fear &amp; Greed Index sentiment readings.</li>
           <li>Real-time market data aggregated from multiple exchanges.</li>
         </ul>
       </section>
 
-      <section className="mt-10 space-y-3">
-        <h2 className="font-display text-2xl font-semibold text-foreground">
+      <section className="mt-8 space-y-3">
+        <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           Market Overview
         </h2>
         <p className="text-muted-foreground">
           CryptoGreedIndex delivers a holistic market snapshot, including:
         </p>
-        <ul className="list-disc space-y-2 pl-6 text-muted-foreground">
+        <ul className="list-disc space-y-2 pl-6 text-sm text-muted-foreground">
           <li>Total market capitalization and 24h volume metrics.</li>
           <li>Bitcoin and Ethereum dominance trends plus altcoin market share.</li>
           <li>Historical Fear &amp; Greed Index movements and sentiment shifts.</li>
@@ -97,8 +97,8 @@ export default function AboutPage() {
         </ul>
       </section>
 
-      <section className="mt-10 space-y-3">
-        <h2 className="font-display text-2xl font-semibold text-foreground">
+      <section className="mt-8 space-y-3">
+        <h2 className="font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
           Contact Us
         </h2>
         <p className="text-muted-foreground">

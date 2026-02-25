@@ -5,10 +5,7 @@ import Link from "next/link";
 import {
   Instagram,
   Linkedin,
-  Send,
   Twitter,
-  ExternalLink,
-  BookOpen,
 } from "lucide-react";
 
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -20,49 +17,36 @@ type FooterLink = {
 };
 
 const productLinks: FooterLink[] = [
-  {
-    labelKey: "footerOverview",
-    href: "/",
-  },
-  {
-    labelKey: "footerCoins",
-    href: "/coins",
-  },
-  {
-    labelKey: "footerBtcDominance",
-    href: "/btc-dominance",
-  },
-  {
-    labelKey: "footerBtcRainbow",
-    href: "/btc-rainbow",
-  },
-  {
-    labelKey: "footerBlog",
-    href: "/blog",
-  },
+  { labelKey: "footerOverview", href: "/" },
+  { labelKey: "footerCoins", href: "/coins" },
+  { labelKey: "footerBtcDominance", href: "/btc-dominance" },
+  { labelKey: "footerBtcRainbow", href: "/btc-rainbow" },
+  { labelKey: "footerBlog", href: "/blog" },
 ];
 
 const resourceLinks: FooterLink[] = [
- 
+  { labelKey: "footerSupport", href: "/contact" },
+  { labelKey: "footerAbout", href: "/about" },
+  { labelKey: "footerPrivacy", href: "/legal/privacy" },
+  { labelKey: "footerTerms", href: "/legal/terms" },
+  { labelKey: "footerDisclaimer", href: "/legal/disclaimer" },
+];
+
+const socialLinks = [
   {
-    labelKey: "footerSupport",
-    href: "/contact",
+    href: "https://www.linkedin.com/feed/",
+    label: "LinkedIn",
+    icon: Linkedin,
   },
   {
-    labelKey: "footerAbout",
-    href: "/about",
+    href: "https://x.com/AnkiTyagi007",
+    label: "X (Twitter)",
+    icon: Twitter,
   },
   {
-    labelKey: "footerPrivacy",
-    href: "/legal/privacy",
-  },
-  {
-    labelKey: "footerTerms",
-    href: "/legal/terms",
-  },
-  {
-    labelKey: "footerDisclaimer",
-    href: "/legal/disclaimer",
+    href: "https://www.instagram.com/crtptogreedindex/",
+    label: "Instagram",
+    icon: Instagram,
   },
 ];
 
@@ -71,52 +55,59 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/80 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-      <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
-        <div className="grid gap-10 md:grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))]">
+    <footer className="border-t border-border/40 bg-card/30 backdrop-blur">
+      <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="grid gap-12 md:grid-cols-[minmax(0,1.5fr)_repeat(2,minmax(0,1fr))]">
+          {/* Brand Column */}
           <div className="space-y-4">
-            <Link href="/" className="inline-flex items-center gap-2 text-foreground">
+            <Link href="/" className="group inline-flex items-center gap-2.5">
               <Image
                 src="/cryptogreedindex-logo.png"
                 alt="Crypto Greed Index logo"
-                width={42}
-                height={42}
-                className="h-9 w-9 rounded-full border border-border/40 bg-background p-0.5"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-full border border-border/30 bg-background p-0.5 transition-transform duration-200 group-hover:scale-105"
               />
-              <span className="font-display text-lg font-semibold text-yellow-500">
-                {t("title")}
+              <span className="font-display text-base font-bold tracking-tight">
+                <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                  Crypto
+                </span>{" "}
+                <span className="text-foreground">Greed Index</span>
               </span>
             </Link>
-            <p className="max-w-sm text-sm text-muted-foreground">
+            <p className="max-w-sm text-xs leading-relaxed text-muted-foreground/80">
               {t("description")}
             </p>
-            {/* <p className="text-sm text-muted-foreground">
-              {t("footerAttribution")}{" "}
-              <Link
-                href="https://coinstats.app/api-docs/"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-primary underline-offset-4 hover:underline"
-              >
-                CoinStats API
-                <ExternalLink className="h-3 w-3" />
-              </Link>
-              .
-            </p> */}
+
+            {/* Social Links */}
+            <div className="flex items-center gap-2">
+              {socialLinks.map((social) => (
+                <Link
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={social.label}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border/40 bg-background/50 text-muted-foreground transition-all duration-200 hover:border-border hover:bg-accent hover:text-foreground"
+                >
+                  <social.icon className="h-4 w-4" />
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <nav className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          {/* Product Links */}
+          <nav className="space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               {t("footerProduct")}
             </h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2.5">
               {productLinks.map((item) => (
                 <li key={item.labelKey}>
                   <Link
                     href={item.href}
-                    className="inline-flex items-center gap-2 hover:text-foreground"
+                    className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
                   >
-                    <BookOpen className="h-4 w-4 text-muted-foreground/70" />
                     {t(item.labelKey)}
                   </Link>
                 </li>
@@ -124,24 +115,21 @@ export default function Footer() {
             </ul>
           </nav>
 
-          <nav className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          {/* Resource Links */}
+          <nav className="space-y-4">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               {t("footerResources")}
             </h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-2.5">
               {resourceLinks.map((item) => (
                 <li key={item.labelKey}>
                   <Link
                     href={item.href}
                     target={item.external ? "_blank" : undefined}
                     rel={item.external ? "noreferrer" : undefined}
-                    className="inline-flex items-center gap-2 hover:text-foreground"
+                    className="text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground"
                   >
-                    <Send className="h-4 w-4 text-muted-foreground/70" />
                     {t(item.labelKey)}
-                    {item.external && (
-                      <ExternalLink className="h-3 w-3 text-muted-foreground/70" />
-                    )}
                   </Link>
                 </li>
               ))}
@@ -149,37 +137,22 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="mt-10 flex flex-col-reverse gap-6 border-t border-border/60 pt-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
-          <p>
-            © {currentYear} Crypto Greed Index. {t("footerRights")}
+        {/* Bottom Bar */}
+        <div className="mt-12 flex flex-col-reverse gap-4 border-t border-border/30 pt-6 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <p className="text-xs">
+            &copy; {currentYear} Crypto Greed Index. {t("footerRights")}
           </p>
-          <div className="flex items-center gap-4 text-foreground">
-            <Link
-              href="https://www.linkedin.com/feed/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-              className="transition-colors hover:text-primary"
-            >
-              <Linkedin className="h-5 w-5" />
+          <div className="flex items-center gap-4 text-xs text-muted-foreground/70">
+            <Link href="/legal/privacy" className="transition-colors hover:text-foreground">
+              Privacy
             </Link>
-            <Link
-              href="https://x.com/AnkiTyagi007"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="X (Twitter)"
-              className="transition-colors hover:text-primary"
-            >
-              <Twitter className="h-5 w-5" />
+            <span className="text-border">|</span>
+            <Link href="/legal/terms" className="transition-colors hover:text-foreground">
+              Terms
             </Link>
-            <Link
-              href="https://www.instagram.com/crtptogreedindex/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-              className="transition-colors hover:text-primary"
-            >
-              <Instagram className="h-5 w-5" />
+            <span className="text-border">|</span>
+            <Link href="/legal/disclaimer" className="transition-colors hover:text-foreground">
+              Disclaimer
             </Link>
           </div>
         </div>
@@ -187,4 +160,3 @@ export default function Footer() {
     </footer>
   );
 }
-

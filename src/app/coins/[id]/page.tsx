@@ -124,22 +124,22 @@ export default async function CoinDetailPage({
   return (
     <div className="bg-gradient-to-b from-background via-background/95 to-background">
       <div className="mx-auto w-full max-w-6xl px-6 py-12">
-        <Breadcrumb className="text-sm text-muted-foreground">
+        <Breadcrumb className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60 transition-colors">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="/" className="hover:text-foreground">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/coins">Cryptocurrencies</Link>
+                <Link href="/coins" className="hover:text-foreground">Cryptocurrencies</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>{coin.name ?? id}</BreadcrumbPage>
+              <BreadcrumbPage className="text-foreground/80">{coin.name ?? id}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -163,35 +163,35 @@ export default async function CoinDetailPage({
             )}
             <div>
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="font-display text-3xl font-bold text-foreground md:text-4xl">
+                <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                   {coin.name}
                 </h1>
                 {coin.symbol && (
-                  <span className="rounded-full border border-border/60 px-3 py-1 text-xs font-semibold uppercase text-muted-foreground">
+                  <span className="rounded-full border border-border/40 bg-muted/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/80">
                     {coin.symbol}
                   </span>
                 )}
                 {typeof coin.rank === "number" && (
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary">
                     Rank #{coin.rank}
                   </span>
                 )}
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Real-time market data provided by CoinStats API.
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                Live {coin.name} Market Data
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col items-start gap-2 text-left sm:items-end sm:text-right">
-            <span className="text-xs uppercase text-muted-foreground">
-              Price ({currency})
+          <div className="flex flex-col items-start gap-1 text-left sm:items-end sm:text-right">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              {coin.name} Price ({currency})
             </span>
-            <span className="text-4xl font-bold text-foreground">
+            <span className="text-3xl font-extrabold tracking-tight text-foreground tabular-nums sm:text-4xl">
               {formattedPrice}
             </span>
             {formattedBtcPrice && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs font-medium text-muted-foreground/70 tabular-nums">
                 {formattedBtcPrice}
               </span>
             )}
@@ -383,10 +383,10 @@ async function getCoinChart(
 
 function MetricRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="flex items-center justify-between">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="font-medium text-foreground">
-        {value ?? "Unavailable"}
+    <div className="flex items-center justify-between py-1">
+      <dt className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/70">{label}</dt>
+      <dd className="text-sm font-bold text-foreground tabular-nums">
+        {value ?? "—"}
       </dd>
     </div>
   );
@@ -412,16 +412,15 @@ function renderChangeBadge(label: string, value?: number) {
   }
 
   const formatted = `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
-  const badgeClass =
-    value > 0
-      ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-inset ring-emerald-500/30"
-      : value < 0
-      ? "bg-red-500/10 text-red-400 ring-1 ring-inset ring-red-500/30"
-      : "bg-muted text-muted-foreground";
+  const isPositive = value > 0;
+  const isNegative = value < 0;
 
   return (
-    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${badgeClass}`}>
-      {label}: {formatted}
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest ${isPositive ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" :
+        isNegative ? "bg-rose-500/10 text-rose-500 border border-rose-500/20" :
+          "bg-muted text-muted-foreground"
+      }`}>
+      {label} {formatted}
     </span>
   );
 }

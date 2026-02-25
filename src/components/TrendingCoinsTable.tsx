@@ -4,6 +4,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronLeft, ChevronRight, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,16 +74,10 @@ function formatNumberCompact(value: number, currency = "USD") {
   }).format(value);
 }
 
-function formatPercent(value: number) {
-  const rounded = Math.abs(value).toFixed(2);
-  if (value > 0) return `▲ ${rounded}%`;
-  if (value < 0) return `▼ ${rounded}%`;
-  return `${rounded}%`;
-}
 
 function getPercentColor(value: number) {
-  if (value > 0) return "text-emerald-400";
-  if (value < 0) return "text-red-400";
+  if (value > 0) return "text-emerald-500";
+  if (value < 0) return "text-rose-500";
   return "text-muted-foreground";
 }
 
@@ -92,8 +87,8 @@ function renderChange(value: number | null | undefined) {
   }
 
   return (
-    <span className={`${getPercentColor(value)} font-medium`}>
-      {formatPercent(value)}
+    <span className={`${getPercentColor(value)} font-bold tabular-nums`}>
+      {value > 0 ? "▲" : value < 0 ? "▼" : ""} {Math.abs(value).toFixed(2)}%
     </span>
   );
 }
@@ -134,7 +129,7 @@ function Sparkline({
     >
       <defs>
         <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity={0.45} />
+          <stop offset="0%" stopColor={color} stopOpacity={0.2} />
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
       </defs>
@@ -146,7 +141,7 @@ function Sparkline({
       <polyline
         fill="none"
         stroke={color}
-        strokeWidth={2}
+        strokeWidth={1.5}
         strokeLinejoin="round"
         strokeLinecap="round"
         points={points}
@@ -253,25 +248,25 @@ export default function TrendingCoinsTable({
 
       const meta: CoinsMeta | undefined = rawMeta
         ? {
-            page: Number(rawMeta.page ?? effectivePage),
-            limit: Number(rawMeta.limit ?? effectivePerPage),
-            itemCount: rawMeta.itemCount,
-            pageCount: rawMeta.pageCount,
-            hasPreviousPage: rawMeta.hasPreviousPage,
-            hasNextPage: rawMeta.hasNextPage,
-          }
+          page: Number(rawMeta.page ?? effectivePage),
+          limit: Number(rawMeta.limit ?? effectivePerPage),
+          itemCount: rawMeta.itemCount,
+          pageCount: rawMeta.pageCount,
+          hasPreviousPage: rawMeta.hasPreviousPage,
+          hasNextPage: rawMeta.hasNextPage,
+        }
         : {
-            page: effectivePage,
-            limit: effectivePerPage,
-            hasPreviousPage: effectivePage > 1,
-            hasNextPage: coins.length === effectivePerPage,
-          };
+          page: effectivePage,
+          limit: effectivePerPage,
+          hasPreviousPage: effectivePage > 1,
+          hasNextPage: coins.length === effectivePerPage,
+        };
 
       return { coins, meta };
     },
     placeholderData: enablePagination ? keepPreviousData : undefined,
-    staleTime: 300_000,
-    refetchInterval: 300_000,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
   });
 
   const coins = data?.coins ?? [];
@@ -293,19 +288,23 @@ export default function TrendingCoinsTable({
     : false;
 
   const sectionClassName =
-    containerClassName ?? "mx-auto w-full max-w-7xl px-6 py-16 lg:py-20";
+    containerClassName ?? "mx-auto w-full max-w-7xl px-4 py-14 sm:px-6 lg:py-20";
 
   return (
     <section className={sectionClassName}>
-      <div className="mb-8 flex flex-col items-center justify-between gap-4 text-center lg:flex-row lg:text-left">
-        <h2 className="font-display text-3xl font-bold text-center md:text-4xl">
-          {computedTitle}
-        </h2>
-        <p className="mt-3 text-muted-foreground text-center">{computedSubtitle}</p>
+      <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="max-w-xl">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            {computedTitle}
+          </h2>
+          <p className="mt-1.5 text-sm text-muted-foreground">{computedSubtitle}</p>
+        </div>
 
         {enablePagination && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{t("tablePerPageLabel", { count: effectivePerPage }) ?? "Per page"}</span>
+          <div className="flex items-center gap-3 self-start lg:self-auto">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+              {t("tablePerPageLabel", { count: effectivePerPage }) ?? "Per page"}
+            </span>
             <Select
               value={String(effectivePerPage)}
               onValueChange={(value) => {
@@ -314,11 +313,11 @@ export default function TrendingCoinsTable({
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-24" data-testid="select-per-page">
+              <SelectTrigger className="w-20 rounded-lg h-9" data-testid="select-per-page">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {[20, 40, 50, 80, 100].map((option) => (
+                {[10, 20, 50, 100].map((option) => (
                   <SelectItem key={option} value={String(option)}>
                     {option}
                   </SelectItem>
@@ -329,69 +328,65 @@ export default function TrendingCoinsTable({
         )}
       </div>
 
-      <Card className="hidden overflow-hidden border border-border/60 bg-background/60 md:block">
+      <Card className="hidden overflow-hidden border-border/40 bg-card/60 backdrop-blur md:block">
         <div className="overflow-x-auto">
-          <table className="min-w-full table-fixed text-sm text-muted-foreground">
-            <thead className="bg-secondary/40 text-xs uppercase tracking-wide text-muted-foreground">
+          <table className="w-full text-sm">
+            <thead className="border-b border-border/40 bg-muted/40 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/80">
               <tr>
-                <th className="px-4 py-3 text-left font-medium">{t("tableRank")}</th>
-                <th className="px-4 py-3 text-left font-medium">{t("tableName")}</th>
-                <th className="px-4 py-3 text-right font-medium">
+                <th className="px-6 py-4 text-left font-bold w-12">#</th>
+                <th className="px-6 py-4 text-left font-bold">{t("tableName")}</th>
+                <th className="px-6 py-4 text-right font-bold">
                   {t("tablePrice", { currency: currencyLabel })}
                 </th>
-                <th className="px-4 py-3 text-right font-medium">{t("tableChange1h")}</th>
-                <th className="px-4 py-3 text-right font-medium">{t("tableChange24h")}</th>
-                <th className="px-4 py-3 text-right font-medium">{t("tableChange7d")}</th>
-                <th className="px-4 py-3 text-right font-medium">{t("tableMarketCap")}</th>
-                <th className="px-4 py-3 text-right font-medium">{t("tableVolume24h")}</th>
-                <th className="px-4 py-3 text-right font-medium">{t("tablePriceGraph")}</th>
+                <th className="px-6 py-4 text-right font-bold">{t("tableChange1h")}</th>
+                <th className="px-6 py-4 text-right font-bold">{t("tableChange24h")}</th>
+                <th className="px-6 py-4 text-right font-bold">{t("tableChange7d")}</th>
+                <th className="px-6 py-4 text-right font-bold">{t("tableMarketCap")}</th>
+                <th className="px-6 py-4 text-right font-bold lg:w-40">{t("tablePriceGraph")}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-border/30">
               {isLoading &&
                 Array.from({ length: effectivePerPage }).map((_, index) => (
-                  <tr key={`row-skeleton-${index}`} className="border-t">
-                    <td className="px-4 py-4">
-                      <Skeleton className="h-4 w-6" />
+                  <tr key={`row-skeleton-${index}`}>
+                    <td className="px-6 py-5">
+                      <Skeleton className="h-4 w-4 rounded" />
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <Skeleton className="h-8 w-8 rounded-full" />
-                        <div className="flex flex-col gap-1">
-                          <Skeleton className="h-4 w-24" />
-                          <Skeleton className="h-3 w-16" />
+                        <div className="space-y-1.5">
+                          <Skeleton className="h-4 w-28 rounded" />
+                          <Skeleton className="h-3 w-16 rounded" />
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-20" />
+                    <td className="px-6 py-5 text-right">
+                      <Skeleton className="ml-auto h-4 w-20 rounded" />
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-16" />
+                    <td className="px-6 py-5 text-right">
+                      <Skeleton className="ml-auto h-4 w-16 rounded" />
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-16" />
+                    <td className="px-6 py-5 text-right">
+                      <Skeleton className="ml-auto h-4 w-16 rounded" />
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-16" />
+                    <td className="px-6 py-5 text-right">
+                      <Skeleton className="ml-auto h-4 w-16 rounded" />
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-24" />
+                    <td className="px-6 py-5 text-right">
+                      <Skeleton className="ml-auto h-4 w-24 rounded" />
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-24" />
-                    </td>
-                    <td className="px-4 py-4 text-right">
-                      <Skeleton className="ml-auto h-4 w-28" />
+                    <td className="px-6 py-5">
+                      <Skeleton className="ml-auto h-8 w-28 rounded-lg" />
                     </td>
                   </tr>
                 ))}
 
               {!isLoading && isError && (
-                <tr className="border-t">
+                <tr>
                   <td
-                    colSpan={9}
-                    className="px-4 py-6 text-center text-muted-foreground"
+                    colSpan={8}
+                    className="px-6 py-12 text-center text-muted-foreground"
                   >
                     {t("tableLoadError")}
                   </td>
@@ -402,52 +397,47 @@ export default function TrendingCoinsTable({
                 coins.map((coin) => (
                   <tr
                     key={coin.id}
-                    className="border-t border-border/30 text-foreground"
+                    className="group transition-colors hover:bg-muted/30"
                   >
-                    <td className="px-4 py-4">{coin.rank}</td>
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4 font-medium text-muted-foreground/50 tabular-nums text-xs">{coin.rank}</td>
+                    <td className="px-6 py-4">
                       <Link
                         href={`/coins/${coin.id}`}
-                        className="flex items-center gap-3 transition-colors hover:text-foreground"
+                        className="flex items-center gap-3"
                       >
                         <Image
                           src={coin.icon}
                           alt={coin.name}
                           width={32}
                           height={32}
-                          className="rounded-full"
+                          className="h-8 w-8 rounded-full bg-white/10 p-0.5"
                         />
                         <div>
-                          <div className="font-medium">{coin.name}</div>
-                          <div className="text-xs uppercase text-muted-foreground">
+                          <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{coin.name}</div>
+                          <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
                             {coin.symbol}
                           </div>
                         </div>
                       </Link>
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-6 py-4 text-right font-bold text-foreground tabular-nums text-sm">
                       {formatCurrency(coin.price, currencyLabel)}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-6 py-4 text-right text-sm">
                       {renderChange(coin.priceChange1h)}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-6 py-4 text-right text-sm">
                       {renderChange(coin.priceChange1d)}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-6 py-4 text-right text-sm">
                       {renderChange(coin.priceChange1w)}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-6 py-4 text-right font-medium text-muted-foreground tabular-nums text-sm">
                       {typeof coin.marketCap === "number"
                         ? formatNumberCompact(coin.marketCap, currencyLabel)
                         : "—"}
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      {typeof coin.volume === "number"
-                        ? formatNumberCompact(coin.volume, currencyLabel)
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-4">
+                    <td className="px-6 py-4">
                       <div className="flex justify-end">
                         {coin.sparkline.length ? (
                           <Sparkline
@@ -455,11 +445,11 @@ export default function TrendingCoinsTable({
                             color={
                               coin.sparkline[coin.sparkline.length - 1] -
                                 coin.sparkline[0] >=
-                              0
-                                ? "#22c55e"
-                                : "#ef4444"
+                                0
+                                ? "#10b981"
+                                : "#f43f5e"
                             }
-                            className="h-10 w-32"
+                            className="h-9 w-28"
                           />
                         ) : (
                           <span className="text-muted-foreground">—</span>
@@ -473,35 +463,28 @@ export default function TrendingCoinsTable({
         </div>
       </Card>
 
-      <div className="space-y-4 md:hidden">
+      {/* Mobile view cards */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
         {isLoading &&
-          Array.from({ length: Math.min(6, effectivePerPage) }).map((_, index) => (
+          Array.from({ length: 6 }).map((_, index) => (
             <Card
               key={`mobile-skeleton-${index}`}
-              className="border border-border/60 bg-background/60 p-4"
+              className="border-border/40 bg-card/50 p-5 backdrop-blur"
             >
               <div className="flex items-center gap-3">
                 <Skeleton className="h-10 w-10 rounded-full" />
                 <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-4 w-32 rounded" />
+                  <Skeleton className="h-3 w-20 rounded" />
                 </div>
-                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-5 w-8 rounded" />
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <Skeleton className="h-10 w-full rounded" />
+                <Skeleton className="h-10 w-full rounded" />
               </div>
             </Card>
           ))}
-
-        {!isLoading && isError && (
-          <Card className="border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            {t("tableLoadError")}
-          </Card>
-        )}
 
         {!isLoading &&
           !isError &&
@@ -509,145 +492,124 @@ export default function TrendingCoinsTable({
             <Link
               key={`mobile-card-${coin.id}`}
               href={`/coins/${coin.id}`}
-              className="block transition hover:no-underline"
+              className="block"
             >
-              <Card className="group space-y-4 border border-border/60 bg-background/60 p-4 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+              <Card className="group relative overflow-hidden border-border/40 bg-card/60 p-5 backdrop-blur transition-all active:scale-[0.98]">
                 <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={coin.icon}
-                    alt={coin.name}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                  <div className="text-left">
-                      <span className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={coin.icon}
+                      alt={coin.name}
+                      width={40}
+                      height={40}
+                      className="h-10 w-10 rounded-full bg-white/10 p-0.5"
+                    />
+                    <div>
+                      <div className="font-bold text-foreground group-hover:text-primary transition-colors">
                         {coin.name}
-                      </span>
-                    <div className="text-xs uppercase text-muted-foreground">
-                      {coin.symbol}
+                      </div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
+                        {coin.symbol}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold text-muted-foreground/50">
+                    #{coin.rank}
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-2 gap-y-4 text-sm">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">
+                      {t("tablePrice", { currency: currencyLabel })}
+                    </p>
+                    <p className="font-bold text-foreground tabular-nums">
+                      {formatCurrency(coin.price, currencyLabel)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">
+                      {t("tableChange24h")}
+                    </p>
+                    <div>{renderChange(coin.priceChange1d)}</div>
+                  </div>
+                  <div className="col-span-2 border-t border-border/20 pt-4 mt-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60 mb-1">
+                          Market Cap
+                        </p>
+                        <p className="font-semibold text-muted-foreground tabular-nums">
+                          {typeof coin.marketCap === "number"
+                            ? formatNumberCompact(coin.marketCap, currencyLabel)
+                            : "—"}
+                        </p>
+                      </div>
+                      <div className="w-24">
+                        {coin.sparkline.length ? (
+                          <Sparkline
+                            data={coin.sparkline}
+                            color={
+                              coin.sparkline[coin.sparkline.length - 1] -
+                                coin.sparkline[0] >=
+                                0
+                                ? "#10b981"
+                                : "#f43f5e"
+                            }
+                            className="h-8 w-full"
+                          />
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <span className="text-xs font-semibold uppercase text-muted-foreground">
-                  #{coin.rank}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide">
-                    {t("tablePrice", { currency: currencyLabel })}
-                  </p>
-                  <p className="mt-1 font-semibold text-foreground">
-                    {formatCurrency(coin.price, currencyLabel)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide">
-                    {t("tableChange24h")}
-                  </p>
-                  <div className="mt-1">{renderChange(coin.priceChange1d)}</div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide">
-                    {t("tableChange7d")}
-                  </p>
-                  <div className="mt-1">{renderChange(coin.priceChange1w)}</div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide">
-                    {t("tableChange1h")}
-                  </p>
-                  <div className="mt-1">{renderChange(coin.priceChange1h)}</div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide">
-                    {t("tableMarketCap")}
-                  </p>
-                  <p className="mt-1 font-medium text-foreground">
-                    {typeof coin.marketCap === "number"
-                      ? formatNumberCompact(coin.marketCap, currencyLabel)
-                      : "—"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide">
-                    {t("tableVolume24h")}
-                  </p>
-                  <p className="mt-1 font-medium text-foreground">
-                    {typeof coin.volume === "number"
-                      ? formatNumberCompact(coin.volume, currencyLabel)
-                      : "—"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="border-t border-border/50 pt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("tablePriceGraph")}
-                </p>
-                <div className="mt-2">
-                  {coin.sparkline.length ? (
-                    <Sparkline
-                      data={coin.sparkline}
-                      color={
-                        coin.sparkline[coin.sparkline.length - 1] -
-                          coin.sparkline[0] >=
-                        0
-                          ? "#22c55e"
-                          : "#ef4444"
-                      }
-                      className="h-10 w-full"
-                    />
-                  ) : (
-                    <span className="text-muted-foreground">—</span>
-                  )}
-                </div>
-              </div>
               </Card>
             </Link>
           ))}
       </div>
 
       {enablePagination && (
-        <div className="mt-6 flex flex-col items-center gap-4 text-sm text-muted-foreground md:flex-row md:justify-between">
-          <div className="text-center md:text-left">
+        <div className="mt-8 flex flex-col items-center justify-between gap-6 border-t border-border/30 pt-8 md:flex-row">
+          <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/70">
             {t("paginationPage", { page: effectivePage })}
             {totalPages ? t("paginationOf", { total: totalPages }) : ""}
             {meta?.itemCount
-              ? t("paginationAssets", {
-                  count: meta.itemCount.toLocaleString("en-US"),
-                })
+              ? ` • ${meta.itemCount.toLocaleString("en-US")} assets`
               : ""}
-            {isFetching ? t("paginationUpdating") : ""}
+            {isFetching ? " • Updating..." : ""}
           </div>
-          <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={!canPrev || isFetching}
-          >
-            {t("previous")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((prev) => prev + 1)}
-            disabled={!canNext || isFetching}
-          >
-            {t("next")}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-lg px-4 h-9 gap-2"
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+              disabled={!canPrev || isFetching}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("previous")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-lg px-4 h-9 gap-2"
+              onClick={() => setPage((prev) => prev + 1)}
+              disabled={!canNext || isFetching}
+            >
+              {t("next")}
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       )}
 
       {showSeeMore && !enablePagination && (
-        <div className="mt-6 flex justify-center">
-          <Button asChild variant="outline" className="rounded-full px-6">
-            <Link href={seeMoreHref}>{t("seeMoreCoins")}</Link>
+        <div className="mt-10 flex justify-center">
+          <Button asChild variant="outline" className="rounded-full px-8 py-6 h-auto font-bold uppercase tracking-wider text-xs border-border/60 hover:border-primary/50 transition-all hover:shadow-lg active:scale-95">
+            <Link href={seeMoreHref} className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              {t("seeMoreCoins")}
+            </Link>
           </Button>
         </div>
       )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { CSSProperties, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useEffect, useRef } from 'react';
 
 interface AdSenseBannerProps {
   adSlot: string;
@@ -26,7 +26,6 @@ export default function AdSenseBanner({
 }: AdSenseBannerProps) {
   const adRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
-  const [isPlaceholderVisible, setPlaceholderVisible] = useState(true);
   const {
     minHeight: providedMinHeight,
     maxHeight: providedMaxHeight,
@@ -50,20 +49,8 @@ export default function AdSenseBanner({
     let retryTimer: ReturnType<typeof setTimeout> | null = null;
     let pollingInterval: ReturnType<typeof setInterval> | null = null;
 
-    const hidePlaceholder = () => {
-      if (!isCancelled) {
-        setPlaceholderVisible((prev) => (prev ? false : prev));
-      }
-    };
-
-    const showPlaceholder = () => {
-      if (!isCancelled) {
-        setPlaceholderVisible(true);
-      }
-    };
-
     const initializeAdSense = () => {
-      if (initialized.current) return;
+      if (initialized.current || isCancelled) return;
 
       if (typeof window !== "undefined" && !window.adSenseInitialized) {
         window.adSenseInitialized = new Set();
@@ -71,7 +58,6 @@ export default function AdSenseBanner({
 
       if (typeof window !== "undefined" && window.adSenseInitialized?.has(adSlot)) {
         initialized.current = true;
-        hidePlaceholder();
         return;
       }
 
@@ -104,7 +90,6 @@ export default function AdSenseBanner({
 
           if (alreadyLoaded) {
             initialized.current = true;
-            hidePlaceholder();
             return;
           }
         }
@@ -115,17 +100,12 @@ export default function AdSenseBanner({
             window.adSenseInitialized.add(adSlot);
           }
           (window.adsbygoogle = window.adsbygoogle || []).push({});
-          setTimeout(() => {
-            hidePlaceholder();
-          }, 2_000);
         } catch (error) {
           console.error("AdSenseBanner: initialization error", error);
           initialized.current = false;
-          showPlaceholder();
         }
       } else {
         retryTimer = setTimeout(() => {
-          showPlaceholder();
           if (!pollingInterval) {
             pollingInterval = setInterval(() => {
               if (!initialized.current) {
@@ -212,24 +192,6 @@ export default function AdSenseBanner({
         data-ad-format={adFormat}
         data-full-width-responsive="true"
       />
-
-      <div
-        className="absolute inset-0 flex items-center justify-center rounded-xl border border-blue-200/40 bg-gradient-to-r from-blue-50 to-indigo-50 text-xs text-blue-500 transition-opacity duration-300"
-        style={{
-          opacity: isPlaceholderVisible ? 1 : 0,
-          minWidth: "50px",
-          minHeight: computedMinHeight,
-          pointerEvents: "none",
-          visibility: isPlaceholderVisible ? "visible" : "hidden",
-          ...(providedMaxHeight ? { maxHeight: providedMaxHeight } : {}),
-        }}
-      >
-        <div className="text-center">
-          <div className="text-sm font-semibold">Advertisement</div>
-          <div className="mt-1 text-[10px] text-blue-400">Slot: {adSlot}</div>
-          <div className="text-[10px] text-blue-400">Loading…</div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -103,6 +103,7 @@ export default function FearGreedDashboard() {
     },
     staleTime: 0,
     gcTime: 0,
+    refetchInterval: 60_000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
@@ -129,6 +130,7 @@ export default function FearGreedDashboard() {
     },
     staleTime: 0,
     gcTime: 0,
+    refetchInterval: 60_000,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
@@ -138,8 +140,8 @@ export default function FearGreedDashboard() {
     chartResponse?.points && chartResponse.points.length > 0
       ? chartResponse.points
       : isChartLoading
-      ? []
-      : fallbackChart;
+        ? []
+        : fallbackChart;
 
   const sentimentData = [
     {

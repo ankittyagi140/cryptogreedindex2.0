@@ -45,36 +45,36 @@ export default function BtcDominancePageContent() {
     dominanceValue === null
       ? "--"
       : `${dominanceValue.toLocaleString("en-US", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}%`;
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}%`;
 
   const summaryTone =
     changeValue === null
       ? "neutral"
       : changeValue > 0
-      ? "positive"
-      : changeValue < 0
-      ? "negative"
-      : "neutral";
+        ? "positive"
+        : changeValue < 0
+          ? "negative"
+          : "neutral";
 
   const changeBadgeClass =
     summaryTone === "positive"
       ? "bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-200"
       : summaryTone === "negative"
-      ? "bg-rose-500/15 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200"
-      : "bg-border/50 text-muted-foreground";
+        ? "bg-rose-500/15 text-rose-700 dark:bg-rose-500/20 dark:text-rose-200"
+        : "bg-border/50 text-muted-foreground";
 
   const changeBadgeLabel =
     changeValue === null
       ? "--"
       : `${changeValue >= 0 ? "▲" : "▼"} ${Math.abs(changeValue).toLocaleString(
-          "en-US",
-          {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          },
-        )}%`;
+        "en-US",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        },
+      )}%`;
 
   type DominanceContent = {
     understandingTitle: string;
@@ -1205,40 +1205,42 @@ export default function BtcDominancePageContent() {
         <BtcDominanceChart />
       </div>
 
-      <div className="container mx-auto px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-border/60 bg-card/90 p-6 shadow-xl sm:p-8 lg:p-10">
-          <h2 className="mb-6 text-center font-display text-3xl font-bold text-foreground sm:text-4xl">
+      <div className="mx-auto w-full max-w-7xl px-4 pb-12 sm:px-6">
+        <div className="rounded-3xl border border-border/40 bg-card/60 p-6 backdrop-blur">
+          <h2 className="mb-6 font-display text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             {content.understandingTitle}
           </h2>
-          <div className="space-y-6 text-muted-foreground">
-            {content.understandingParagraphs.map((paragraph) => (
-              <p key={paragraph.slice(0, 32)} className="text-base leading-relaxed sm:text-lg">
-                {paragraph}
-              </p>
-            ))}
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="space-y-4 text-sm leading-relaxed text-muted-foreground/80">
+              {content.understandingParagraphs.map((paragraph) => (
+                <p key={paragraph.slice(0, 32)}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
 
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
-              <div className="rounded-xl border border-emerald-200/60 bg-emerald-500/10 p-6 sm:p-8 dark:border-emerald-500/30 dark:bg-emerald-500/15">
-                <h3 className="mb-4 font-display text-xl font-bold text-foreground sm:text-2xl">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 dark:border-emerald-500/10">
+                <h3 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-emerald-500">
                   {content.highTitle}
                 </h3>
-                <ul className="space-y-3 text-sm text-foreground sm:text-base">
+                <ul className="space-y-2 text-xs text-foreground/80">
                   {content.highBullets.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500" />
+                    <li key={item} className="flex items-start gap-2">
+                      <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-emerald-500" />
                       <span className="flex-1 leading-relaxed">{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-xl border border-blue-200/60 bg-blue-500/10 p-6 sm:p-8 dark:border-blue-500/30 dark:bg-blue-500/15">
-                <h3 className="mb-4 font-display text-xl font-bold text-foreground sm:text-2xl">
+              <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-5 dark:border-blue-500/10">
+                <h3 className="mb-3 text-[10px] font-bold uppercase tracking-widest text-blue-500">
                   {content.lowTitle}
                 </h3>
-                <ul className="space-y-3 text-sm text-foreground sm:text-base">
+                <ul className="space-y-2 text-xs text-foreground/80">
                   {content.lowBullets.map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
+                    <li key={item} className="flex items-start gap-2">
+                      <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-blue-500" />
                       <span className="flex-1 leading-relaxed">{item}</span>
                     </li>
                   ))}
@@ -1297,11 +1299,10 @@ export default function BtcDominancePageContent() {
                   {column.map((item) => (
                     <div key={item.title} className="flex items-start gap-3">
                       <span
-                        className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${
-                          item.accent === "emerald"
+                        className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${item.accent === "emerald"
                             ? "bg-emerald-500"
                             : "bg-blue-500"
-                        }`}
+                          }`}
                       />
                       <div>
                         <span className="font-semibold text-foreground">
@@ -1336,11 +1337,10 @@ export default function BtcDominancePageContent() {
               {content.factorsColumns.map((column) => (
                 <div
                   key={column.title}
-                  className={`rounded-xl p-6 sm:p-8 ${
-                    column.accent === "yellow"
+                  className={`rounded-xl p-6 sm:p-8 ${column.accent === "yellow"
                       ? "border-yellow-200/60 bg-yellow-500/10 dark:border-yellow-500/30 dark:bg-yellow-500/15"
                       : "border-rose-200/60 bg-rose-500/10 dark:border-rose-500/30 dark:bg-rose-500/15"
-                  }`}
+                    }`}
                 >
                   <h3 className="mb-4 font-display text-xl font-bold text-foreground sm:text-2xl">
                     {column.title}
@@ -1349,11 +1349,10 @@ export default function BtcDominancePageContent() {
                     {column.bullets.map((item) => (
                       <li key={item} className="flex items-start gap-3">
                         <span
-                          className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${
-                            column.accent === "yellow"
+                          className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${column.accent === "yellow"
                               ? "bg-yellow-500"
                               : "bg-rose-500"
-                          }`}
+                            }`}
                         />
                         <span className="flex-1 leading-relaxed">{item}</span>
                       </li>

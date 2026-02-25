@@ -18,27 +18,26 @@ export const metadata: Metadata = {
 
   title: {
     default:
-      "Fear and Greed Index – Real-Time Crypto Market Sentiment & Indicators",
-    template: "%s | Fear and Greed Index",
+      "Crypto Fear and Greed Index – Live Market Sentiment & Price Indicators",
+    template: "%s | Crypto Fear and Greed Index",
   },
 
   description:
-    "Fear and Greed Index with real-time crypto market sentiment indicators, fear & greed scores, bitcoin dominance, global market cap, and top crypto gainers and losers.",
+    "Real-time Crypto Fear and Greed Index. Track live market sentiment, bitcoin dominance, global market capitalization, and top cryptocurrency gainers and losers. Accurate data for Bitcoin, Ethereum, and altcoins.",
 
   keywords: [
     "fear and greed index",
-    "index fear and greed",
-    "fear greed indicator",
-    "fear greed index",
     "crypto fear and greed index",
-    "bitcoin fear and greed",
+    "index fear and greed",
+    "bitcoin fear and greed index",
     "crypto market sentiment",
-    "fear and greed",
-    "market fear and greed",
-    "bitcoin dominance",
+    "live crypto indicators",
+    "bitcoin dominance chart",
     "crypto market cap",
-    "crypto top gainers",
-    "crypto top losers",
+    "crypto sentiment analysis",
+    "altcoin season indicator",
+    "market fear and greed",
+    "crypto gainers and losers",
   ],
 
   applicationName: "Fear and Greed Index",
@@ -257,11 +256,54 @@ const marketOverviewDatasetSchema = {
   ],
 };
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the Crypto Fear and Greed Index?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Crypto Fear and Greed Index is a tool that measures the emotional sentiment of the cryptocurrency market. It ranges from 0 (Extreme Fear) to 100 (Extreme Greed)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is the Fear and Greed Index calculated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The index is calculated using factors like volatility, market momentum/volume, social media sentiment, bitcoin dominance, and Google Trends data."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why is Bitcoin dominance important?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bitcoin dominance tracks BTC's share of the total crypto market cap. High dominance often signals a 'risk-off' environment, while falling dominance can indicate an 'altcoin season'."
+      }
+    }
+  ]
+};
+
+const financialServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "FinancialService",
+  "name": "Crypto Fear and Greed Index",
+  "description": "Real-time cryptocurrency market analysis and sentiment tracking service.",
+  "url": "https://www.cryptogreedindex.com",
+  "category": "Cryptocurrency Analysis",
+  "feesAndCommissionsSpecification": "Free to use"
+};
+
 const schemaScripts = [
   organizationSchema,
   websiteSchema,
   fearGreedDatasetSchema,
   marketOverviewDatasetSchema,
+  faqSchema,
+  financialServiceSchema,
 ];
 
 /* =========================
